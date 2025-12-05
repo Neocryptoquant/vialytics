@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
-import { Header } from "@/components/Header";
+import Header from "@/components/Header";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -18,6 +18,8 @@ export const metadata: Metadata = {
   description: "Visual analytics for your wallet history",
 };
 
+import { WalletContextProvider } from "@/components/WalletContextProvider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -26,12 +28,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${spaceGrotesk.variable} ${inter.variable} antialiased flex flex-col min-h-screen`}
+        className={`${spaceGrotesk.variable} ${inter.variable} antialiased bg-background text-foreground`}
       >
-        <Header />
-        <main className="flex-grow">
-          {children}
-        </main>
+        <WalletContextProvider>
+          <div className="flex flex-col min-h-screen">
+            <Header />
+            <main className="flex-grow">
+              {children}
+            </main>
+          </div>
+        </WalletContextProvider>
       </body>
     </html>
   );
