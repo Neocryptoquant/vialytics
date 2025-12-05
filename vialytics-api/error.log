@@ -1,0 +1,46 @@
+LLM Error in analyze_query: 2 validation errors for Intent
+sql_query
+  Field required [type=missing, input_value={'action': 'greeting', 't...? What's on your mind?"}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+visualization_type
+  Field required [type=missing, input_value={'action': 'greeting', 't...? What's on your mind?"}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+LLM Error in analyze_query: 2 validation errors for Intent
+sql_query
+  Field required [type=missing, input_value={'action': 'greeting', 't...conversational skills.'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+visualization_type
+  Field required [type=missing, input_value={'action': 'greeting', 't...conversational skills.'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+LLM Error in analyze_query: 2 validation errors for Intent
+sql_query
+  Field required [type=missing, input_value={'action': 'explain', 'te...a heart full of WAGMI!"}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+visualization_type
+  Field required [type=missing, input_value={'action': 'explain', 'te...a heart full of WAGMI!"}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+LLM Error in analyze_query: 2 validation errors for Intent
+sql_query
+  Field required [type=missing, input_value={'action': 'explain', 'te... queries or just chat."}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+visualization_type
+  Field required [type=missing, input_value={'action': 'explain', 'te... queries or just chat."}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+LLM Error in analyze_query: 1 validation error for Intent
+sql_query
+  Field required [type=missing, input_value={'action': 'greeting', 'v...ts or just wanna chat?"}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+LLM Error in analyze_query: 2 validation errors for Intent
+sql_query
+  Field required [type=missing, input_value={'action': 'greeting', 't...nto some transactions?"}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+visualization_type
+  Field required [type=missing, input_value={'action': 'greeting', 't...nto some transactions?"}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+LLM Error in analyze_query: 2 validation errors for Intent
+sql_query
+  Field required [type=missing, input_value={'action': 'greeting', 't...ry or just wanna chat?"}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+visualization_type
+  Field required [type=missing, input_value={'action': 'greeting', 't...ry or just wanna chat?"}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing

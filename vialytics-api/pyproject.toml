@@ -6,8 +6,18 @@ authors = [
     {name = "Emmanuel",email = "neocrytpoquant@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.11,<4.0"
 dependencies = [
+    "fastapi (>=0.123.9,<0.124.0)",
+    "uvicorn (>=0.38.0,<0.39.0)",
+    "pydantic (>=2.12.5,<3.0.0)",
+    "python-dotenv (>=1.2.1,<2.0.0)",
+    "sqlalchemy (>=2.0.44,<3.0.0)",
+    "pandas (>=2.3.3,<3.0.0)",
+    "langchain (>=1.1.2,<2.0.0)",
+    "openai (>=2.9.0,<3.0.0)",
+    "google-genai (>=1.53.0,<2.0.0)",
+    "pydantic-settings (>=2.12.0,<3.0.0)",
 ]
 
 [tool.poetry]
