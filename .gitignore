@@ -1,6 +1,45 @@
-*/target
-**/*.rs.bk
-*.db
-*.sqlite
-vialytics-core/Vixen.toml
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
 .env
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+.next/
+dist/
+.cache/
+*.log
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+analytics_output*.json
+wallet.db
+*.db-journal
+poetry.lock
+
+# Rust
+target/
+Cargo.lock
+
+# Supabase
+supabase/.branches/
+supabase/.temp/
