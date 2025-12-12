@@ -1,13 +1,14 @@
 import { Search, Sprout } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ModeToggle } from "@/components/ModeToggle";
+import Avatar from "@/components/ui/avatar";
 
 export function Header() {
     return (
         <header className="h-20 px-8 flex items-center justify-between bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-100">
             {/* Logo */}
             <div className="flex items-center gap-3">
-                <img src="/vialytics-logo.jpg" alt="Vialytics" className="w-10 h-10 object-contain" />
+                <Avatar svg="/logo.svg" jpg="/vialytics-logo.jpg" alt="Vialytics" className="w-10 h-10 object-contain" />
                 <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-orange-500 bg-clip-text text-transparent tracking-tight">Vialytics</span>
             </div>
 

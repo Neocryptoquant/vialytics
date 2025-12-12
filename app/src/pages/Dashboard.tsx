@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import {
     Area,
     AreaChart,
@@ -21,14 +22,20 @@ import { SolanaNews } from "@/components/SolanaNews";
 type TimeRange = "7D" | "1M" | "3M" | "ALL";
 
 export function Dashboard() {
+    const { wallet } = useParams<{ wallet: string }>();
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [timeRange, setTimeRange] = useState<TimeRange>("1M");
 
     useEffect(() => {
         const fetchAnalytics = async () => {
+            if (!wallet) return;
+
             try {
-                const response = await fetch("http://localhost:8000/api/analytics");
+                const response = await fetch(`http://localhost:8000/api/analytics/${wallet}`);
+                if (!response.ok) {
+                    throw new Error("Failed to fetch analytics");
+                }
                 const result = await response.json();
                 setData(result);
             } catch (error) {
@@ -39,7 +46,7 @@ export function Dashboard() {
         };
 
         fetchAnalytics();
-    }, []);
+    }, [wallet]);
 
     if (loading || !data) {
         return (
@@ -150,8 +157,8 @@ export function Dashboard() {
                                         key={range}
                                         onClick={() => setTimeRange(range)}
                                         className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${timeRange === range
-                                                ? "bg-purple-500 text-white shadow-md"
-                                                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                            ? "bg-purple-500 text-white shadow-md"
+                                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                                             }`}
                                     >
                                         {range}

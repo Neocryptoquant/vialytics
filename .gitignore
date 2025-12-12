@@ -1,45 +1,23 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-venv/
-ENV/
-.env
-*.egg-info/
-dist/
-build/
+# Vialytics - Git Ignore
 
-# Node
-node_modules/
-.next/
-dist/
-.cache/
+# Frontend
+app/node_modules/
+app/dist/
+app/.env
+app/.DS_Store
+
+# Backend
+vialytics-api/venv/
+vialytics-api/__pycache__/
+vialytics-api/*.pyc
+vialytics-api/.env
+
+# Core
+vialytics-core/target/
+vialytics-core/wallet.db
+vialytics-core/Cargo.lock
+
+# Temp files
 *.log
-.env.local
-.env.*.local
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
+*.db
 .DS_Store
-Thumbs.db
-
-# Project specific
-analytics_output*.json
-wallet.db
-*.db-journal
-poetry.lock
-
-# Rust
-target/
-Cargo.lock
-
-# Supabase
-supabase/.branches/
-supabase/.temp/

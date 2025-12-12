@@ -3,8 +3,24 @@ import index from "./index.html";
 
 const server = serve({
   routes: {
-    // Serve index.html for all unmatched routes.
+    // Static assets from `public/` (serve these before the catch-all index route)
+    "/logo.svg": Bun.file("./public/logo.svg"),
+    "/mascot.svg": Bun.file("./public/mascot.svg"),
+    "/via-mascot.jpg": Bun.file("./public/via-mascot.jpg"),
+    "/vialytics-logo.jpg": Bun.file("./public/vialytics-logo.jpg"),
+    "/logo-vialytics.jpg": Bun.file("./public/logo-vialytics.jpg"),
+
+    // Serve index.html for all unmatched routes
     "/*": index,
+
+    // API endpoint to get env vars
+    "/api/config": {
+      async GET(req) {
+        return Response.json({
+          groqApiKey: process.env.VITE_GROQ_API_KEY || ""
+        });
+      }
+    },
 
     "/api/hello": {
       async GET(req) {
@@ -39,3 +55,4 @@ const server = serve({
 });
 
 console.log(`🚀 Server running at ${server.url}`);
+console.log(`🔑 Groq API Key: ${process.env.VITE_GROQ_API_KEY ? "✅ Loaded" : "❌ Missing"}`);

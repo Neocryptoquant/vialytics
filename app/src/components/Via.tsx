@@ -1,10 +1,12 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { MessageCircle, X, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { WalletIntelligence } from "@/lib/ai-pipe";
+import Avatar from "@/components/ui/avatar";
 
 interface Message {
     role: "user" | "assistant";
@@ -18,6 +20,27 @@ export function Via() {
     ]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
+    const [analytics, setAnalytics] = useState<any>(null);
+
+    // Fetch analytics when component mounts
+    useEffect(() => {
+        const fetchAnalytics = async () => {
+            try {
+                // Try to get wallet from URL
+                const wallet = window.location.pathname.split('/').pop();
+                if (wallet && wallet.length > 20) {
+                    const response = await fetch(`http://localhost:8000/api/analytics/${wallet}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        setAnalytics(data);
+                    }
+                }
+            } catch (error) {
+                console.log("Analytics not available yet");
+            }
+        };
+        fetchAnalytics();
+    }, []);
 
     const sendMessage = async () => {
         if (!input.trim()) return;
@@ -27,19 +50,47 @@ export function Via() {
         setInput("");
         setLoading(true);
 
+        // Fetch API key from server
+        let apiKey = "";
         try {
-            const ai = new WalletIntelligence({
-                apiKey: import.meta.env.VITE_GEMINI_API_KEY,
-                provider: 'google',
-                model: 'gemini-1.5-flash'
-            });
-
-            const response = await ai.chat([...messages, userMessage]);
-            setMessages(prev => [...prev, { role: "assistant", content: response }]);
+            const configResponse = await fetch("/api/config");
+            const config = await configResponse.json();
+            apiKey = config.groqApiKey;
         } catch (error) {
+            console.error("Failed to fetch config:", error);
+        }
+
+        // Debug logging
+        console.log("🔍 Sending message:", userMessage.content);
+        console.log("🔑 API Key:", apiKey ? "Loaded ✅" : "Missing ❌");
+
+        if (!apiKey) {
             setMessages(prev => [...prev, {
                 role: "assistant",
-                content: "Oops! I'm having trouble connecting right now. Check your API key!"
+                content: "API key not configured. Add VITE_GROQ_API_KEY to your .env file and restart."
+            }]);
+            setLoading(false);
+            return;
+        }
+
+        try {
+            const ai = new WalletIntelligence({
+                apiKey: apiKey,
+                provider: 'groq',
+                model: 'llama-3.3-70b-versatile',
+                analytics: analytics // Pass analytics as context
+            });
+
+            console.log("📞 Calling AI...");
+            const response = await ai.chat([...messages, userMessage]);
+            console.log("✅ AI Response:", response);
+
+            setMessages(prev => [...prev, { role: "assistant", content: response }]);
+        } catch (error) {
+            console.error("❌ AI Error:", error);
+            setMessages(prev => [...prev, {
+                role: "assistant",
+                content: "Oops! Error calling Groq API. Check console for details."
             }]);
         } finally {
             setLoading(false);
@@ -58,7 +109,7 @@ export function Via() {
                     isOpen && "scale-0"
                 )}
             >
-                <img src="/via-mascot.jpg" alt="Via" className="w-14 h-14 rounded-full object-cover border-2 border-white" />
+                <Avatar preferJpg svg="/mascot.svg" jpg="/via-mascot.jpg" alt="Via" className="w-14 h-14 rounded-full object-cover border-2 border-white" />
                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse" />
             </button>
 
@@ -71,7 +122,7 @@ export function Via() {
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-purple-500 to-orange-400">
                     <div className="flex items-center gap-3">
-                        <img src="/via-mascot.jpg" alt="Via" className="w-10 h-10 rounded-full border-2 border-white" />
+                        <Avatar preferJpg svg="/mascot.svg" jpg="/via-mascot.jpg" alt="Via" className="w-10 h-10 rounded-full border-2 border-white" />
                         <div>
                             <h3 className="font-bold text-white">Chat with Via</h3>
                             <p className="text-xs text-white/80">Your AI Wallet Assistant</p>
@@ -98,7 +149,7 @@ export function Via() {
                             )}
                         >
                             {msg.role === "assistant" && (
-                                <img src="/via-mascot.jpg" alt="Via" className="w-8 h-8 rounded-full flex-shrink-0" />
+                                <Avatar preferJpg svg="/mascot.svg" jpg="/via-mascot.jpg" alt="Via" className="w-8 h-8 rounded-full flex-shrink-0" />
                             )}
                             <div
                                 className={cn(
@@ -114,7 +165,7 @@ export function Via() {
                     ))}
                     {loading && (
                         <div className="flex gap-2 justify-start">
-                            <img src="/via-mascot.jpg" alt="Via" className="w-8 h-8 rounded-full" />
+                            <Avatar preferJpg svg="/mascot.svg" jpg="/via-mascot.jpg" alt="Via" className="w-8 h-8 rounded-full" />
                             <div className="bg-white border border-slate-200 rounded-2xl px-4 py-2">
                                 <div className="flex gap-1">
                                     <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />

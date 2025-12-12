@@ -1,0 +1,125 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Sparkles, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import Avatar from "@/components/ui/avatar";
+
+export function LandingPage() {
+    const [walletAddress, setWalletAddress] = useState("");
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+
+    const validateSolanaAddress = (address: string): boolean => {
+        // Solana addresses are base58-encoded, 32-44 characters
+        const base58Regex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+        return base58Regex.test(address);
+    };
+
+    const handleAnalyze = async () => {
+        setError("");
+
+        if (!walletAddress.trim()) {
+            setError("Please enter a wallet address");
+            return;
+        }
+
+        if (!validateSolanaAddress(walletAddress)) {
+            setError("Invalid Solana wallet address");
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            // Check if analytics already exist in cache
+            const cacheResponse = await fetch(`http://localhost:8000/api/analytics/${walletAddress}`);
+
+            if (cacheResponse.ok) {
+                // Analytics exist, go straight to dashboard
+                navigate(`/dashboard/${walletAddress}`);
+                return;
+            }
+
+            // Need to index - go to loading page
+            navigate(`/loading/${walletAddress}`);
+        } catch (err) {
+            setError("Failed to connect to server. Make sure the API is running.");
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+            <div className="w-full max-w-lg">
+                {/* Simple Card */}
+                <div className="bg-white rounded-3xl p-10 shadow-lg">
+
+                    {/* Via Mascot - Simplified */}
+                    <div className="flex justify-center mb-6">
+                        <Avatar svg="/mascot.svg" jpg="/via-mascot.jpg" alt="Via" className="w-32 h-32 rounded-full object-cover shadow-xl" />
+                    </div>
+
+                    {/* Title */}
+                    <div className="text-center mb-8">
+                        <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-600 to-orange-500 bg-clip-text text-transparent">
+                            Vialytics
+                        </h1>
+                        <p className="text-slate-600">
+                            Your personal Solana wallet analytics companion
+                        </p>
+                    </div>
+
+                    {/* Wallet Input */}
+                    <div className="space-y-4">
+                        <Input
+                            type="text"
+                            value={walletAddress}
+                            onChange={(e) => {
+                                setWalletAddress(e.target.value);
+                                setError("");
+                            }}
+                            onKeyPress={(e) => e.key === "Enter" && handleAnalyze()}
+                            placeholder="Enter your Solana wallet address..."
+                            className="h-14 px-4 text-base"
+                            disabled={loading}
+                        />
+                        {error && (
+                            <p className="text-red-500 text-sm">{error}</p>
+                        )}
+
+                        {/* CTA Button */}
+                        <Button
+                            onClick={handleAnalyze}
+                            disabled={loading}
+                            className="w-full h-14 text-base font-semibold bg-gradient-to-r from-purple-500 to-orange-400 hover:from-purple-600 hover:to-orange-500 text-white"
+                        >
+                            {loading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                    Checking...
+                                </>
+                            ) : (
+                                <>
+                                    <Sparkles className="mr-2 h-5 w-5" />
+                                    Analyze My Wallet
+                                </>
+                            )}
+                        </Button>
+
+                        {/* Info Text */}
+                        <p className="text-center text-sm text-slate-500">
+                            We analyze your transactions to give you beginner-friendly insights
+                        </p>
+                    </div>
+                </div>
+
+                {/* Footer */}
+                <div className="text-center mt-6 text-slate-400 text-sm">
+                    Powered by Solana • Built with ❤️ by the Vialytics team
+                </div>
+            </div>
+        </div>
+    );
+}

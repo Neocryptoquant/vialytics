@@ -1,9 +1,9 @@
-
 export interface AIConfig {
   apiKey?: string;
   baseUrl?: string;
-  provider?: 'openai' | 'groq' | 'google' | 'deepseek';
+  provider?: 'openai' | 'groq' | 'google' | 'deepseek' | 'gemini';
   model?: string;
+  analytics?: any; // Wallet analytics data
 }
 
 export interface ChatMessage {
@@ -26,13 +26,82 @@ export class WalletIntelligence {
   }
 
   async chat(messages: ChatMessage[]): Promise<string> {
-    if (!this.config.apiKey) {
-      console.warn("WalletIntelligence: No API key provided.");
-      return "I can help you analyze your wallet data. Please configure your API key to get real insights.";
+    // Use Groq API (OpenAI-compatible, free tier)
+    const apiKey = this.config.apiKey;
+    const apiUrl = "https://api.groq.com/openai/v1/chat/completions";
+
+    if (!apiKey) {
+      return "Please configure your Groq API key. Get one free at https://console.groq.com";
+    }
+
+    // Build system prompt with analytics context
+    let systemPrompt = "You are Via, a friendly AI wallet assistant for Vialytics. Help users understand their Solana wallet analytics in simple, beginner-friendly language. Be concise and helpful.";
+
+    if (this.config.analytics) {
+      const a = this.config.analytics;
+      systemPrompt += `\n\nWallet Analytics Context:\n`;
+      systemPrompt += `- Total Balance: $${a.portfolio_overview?.total_balance_usd || 0}\n`;
+      systemPrompt += `- Money In: $${a.earnings_spending?.total_received_usd || 0}\n`;
+      systemPrompt += `- Money Out: $${a.earnings_spending?.total_sent_usd || 0}\n`;
+      systemPrompt += `- Net Flow: $${a.earnings_spending?.net_flow || 0}\n`;
+      systemPrompt += `- Active Days: ${a.activity_insights?.active_days_count || 0}\n`;
+      systemPrompt += `- Total Transactions: ${a.activity_insights?.total_transactions || 0}\n`;
+
+      if (a.portfolio_overview?.top_tokens?.length > 0) {
+        systemPrompt += `- Top Tokens: ${a.portfolio_overview.top_tokens.slice(0, 3).map((t: any) => `${t.symbol} ($${t.value_usd.toFixed(2)})`).join(', ')}\n`;
+      }
     }
 
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${this.config.model || 'gemini-1.5-flash'}:generateContent?key=${this.config.apiKey}`, {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: [
+            { role: "system", content: systemPrompt },
+            ...messages.map(m => ({
+              role: m.role === 'system' ? 'system' : m.role,
+              content: m.content
+            }))
+          ],
+          temperature: 0.7,
+          max_tokens: 500
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Groq API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.choices?.[0]?.message?.content || "Sorry, I couldn't process that.";
+    } catch (error) {
+      console.error("AI chat error:", error);
+      return "Sorry, I'm having trouble connecting to Groq. Please check your API key and internet connection.";
+    }
+  }
+
+  /* GEMINI VERSION (COMMENTED OUT)
+  async chat(messages: ChatMessage[]): Promise<string> {
+    const apiKey = this.config.apiKey;
+    const model = this.config.model || 'gemini-1.5-flash';
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    
+    if (!apiKey) {
+      return "Please configure your Gemini API key.";
+    }
+
+    let systemPrompt = "You are Via...";
+    if (this.config.analytics) {
+      // Add analytics context
+    }
+    
+    try {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -40,19 +109,16 @@ export class WalletIntelligence {
             role: m.role === 'assistant' ? 'model' : 'user',
             parts: [{ text: m.content }]
           })).filter(m => m.role !== 'system'),
-          systemInstruction: {
-            parts: [{ text: "You are Via, a friendly AI wallet assistant for Vialytics. Help users understand their Solana wallet analytics in simple, beginner-friendly language. Be concise and helpful." }]
-          }
+          systemInstruction: { parts: [{ text: systemPrompt }] }
         })
       });
-
       const data = await response.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't process that.";
+      return data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry...";
     } catch (error) {
-      console.error("AI chat error:", error);
-      return "Sorry, I'm having trouble connecting right now.";
+      return "Gemini error";
     }
   }
+  */
 
   async generateInsights(analyticsData: any): Promise<WalletInsights> {
     if (!this.config.apiKey) {
