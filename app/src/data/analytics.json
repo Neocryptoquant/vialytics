@@ -1,0 +1,136 @@
+{
+  "portfolio_overview": {
+    "total_balance_usd": 0.0,
+    "total_balance_history": [],
+    "top_tokens": [
+      {
+        "symbol": "5fzu...Kzc2",
+        "amount": 28561.606622,
+        "value_usd": 0.0,
+        "share_percent": 0
+      }
+    ]
+  },
+  "earnings_spending": {
+    "total_received_usd": 700547.62,
+    "total_sent_usd": 700646.39,
+    "net_flow": -98.77,
+    "biggest_incoming": {
+      "value": 699759.362239,
+      "label": "Received DezX...B263"
+    },
+    "biggest_outgoing": {
+      "value": 700109.4169405,
+      "label": "Sent DezX...B263"
+    },
+    "average_transaction_size": 45199.81
+  },
+  "token_insights": [
+    {
+      "token": "USDC",
+      "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "current_holdings": 0.0,
+      "total_received": 155.969839,
+      "total_sent": 155.96983899999998
+    },
+    {
+      "token": "ADNS...Did1",
+      "mint": "ADNScivK6Pt2XsfsufuyUiZaKbRww5JANDvZ7texDid1",
+      "current_holdings": 0.0,
+      "total_received": 283.0,
+      "total_sent": 283.0
+    },
+    {
+      "token": "USDT",
+      "mint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+      "current_holdings": 0.0,
+      "total_received": 279.513268,
+      "total_sent": 279.513268
+    },
+    {
+      "token": "Wrapped SOL",
+      "mint": "So11111111111111111111111111111111111111112",
+      "current_holdings": -0.726250182,
+      "total_received": 0.02,
+      "total_sent": 0.746250182
+    },
+    {
+      "token": "META...Y18m",
+      "mint": "METAewgxyPbgwsseH8T16a39CQ5VyVxZi9zXiDPY18m",
+      "current_holdings": 0.0,
+      "total_received": 30.132147,
+      "total_sent": 30.132147
+    },
+    {
+      "token": "DezX...B263",
+      "mint": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+      "current_holdings": 0.0,
+      "total_received": 28575.894569,
+      "total_sent": 28575.894569
+    },
+    {
+      "token": "5fzu...Kzc2",
+      "mint": "5fzuPMnSeGFhUFN6szN8tqL676TDE1m4YH13ZC1LKzc2",
+      "current_holdings": 28561.606622,
+      "total_received": 28561.606622,
+      "total_sent": 0
+    }
+  ],
+  "activity_insights": {
+    "total_transactions": 91,
+    "first_activity": "2025-07-07",
+    "last_activity": "2025-12-03",
+    "active_days_count": 31,
+    "monthly_frequency": {
+      "2025-07": 6,
+      "2025-08": 1,
+      "2025-09": 8,
+      "2025-10": 33,
+      "2025-11": 34,
+      "2025-12": 9
+    }
+  },
+  "income_streams": {
+    "top_income_sources": [
+      {
+        "source": "J9K6...d7Ve",
+        "value_usd": 699759.36
+      },
+      {
+        "source": "6ejo...n7eg",
+        "value_usd": 350.05
+      },
+      {
+        "source": "2QkJ...RGSR",
+        "value_usd": 122.48
+      },
+      {
+        "source": "65ZH...iDUc",
+        "value_usd": 69.45
+      },
+      {
+        "source": "FkEB...wR32",
+        "value_usd": 69.43
+      }
+    ]
+  },
+  "spending_categories": {
+    "top_spending_categories": [
+      {
+        "category": "Network Fees",
+        "value_usd": 0.23
+      }
+    ]
+  },
+  "interactions": {
+    "top_apps_platforms": []
+  },
+  "security": {
+    "failed_transactions_count": 4,
+    "security_score": "High"
+  },
+  "highlights": {
+    "wallet_personality": "Hodler",
+    "top_moment": "You made your biggest trade!"
+  }
+}
