@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { WalletIntelligence } from "@/lib/ai-pipe";
 import Avatar from "@/components/ui/avatar";
+import { FormattedText } from "@/components/FormattedText";
 
 interface Message {
     role: "user" | "assistant";
@@ -109,7 +110,7 @@ export function Via() {
                     isOpen && "scale-0"
                 )}
             >
-                <Avatar preferJpg svg="/mascot.svg" jpg="/via-mascot.jpg" alt="Via" className="w-14 h-14 rounded-full object-cover border-2 border-white" />
+                    <Avatar svg="/via-mascot.svg" jpg="/via-mascot.jpg" alt="Via" className="w-14 h-14 rounded-full object-cover border-2 border-white" />
                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse" />
             </button>
 
@@ -122,7 +123,7 @@ export function Via() {
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-purple-500 to-orange-400">
                     <div className="flex items-center gap-3">
-                        <Avatar preferJpg svg="/mascot.svg" jpg="/via-mascot.jpg" alt="Via" className="w-10 h-10 rounded-full border-2 border-white" />
+                            <Avatar svg="/via-mascot.svg" jpg="/via-mascot.jpg" alt="Via" className="w-10 h-10 rounded-full border-2 border-white" />
                         <div>
                             <h3 className="font-bold text-white">Chat with Via</h3>
                             <p className="text-xs text-white/80">Your AI Wallet Assistant</p>
@@ -149,7 +150,7 @@ export function Via() {
                             )}
                         >
                             {msg.role === "assistant" && (
-                                <Avatar preferJpg svg="/mascot.svg" jpg="/via-mascot.jpg" alt="Via" className="w-8 h-8 rounded-full flex-shrink-0" />
+                                <Avatar svg="/via-mascot.svg" jpg="/via-mascot.jpg" alt="Via" className="w-8 h-8 rounded-full flex-shrink-0" />
                             )}
                             <div
                                 className={cn(
@@ -159,13 +160,17 @@ export function Via() {
                                         : "bg-white border border-slate-200 text-slate-800"
                                 )}
                             >
-                                {msg.content}
+                                {msg.role === "assistant" ? (
+                                    <FormattedText text={msg.content} />
+                                ) : (
+                                    msg.content
+                                )}
                             </div>
                         </div>
                     ))}
                     {loading && (
                         <div className="flex gap-2 justify-start">
-                            <Avatar preferJpg svg="/mascot.svg" jpg="/via-mascot.jpg" alt="Via" className="w-8 h-8 rounded-full" />
+                            <Avatar svg="/via-mascot.svg" jpg="/via-mascot.jpg" alt="Via" className="w-8 h-8 rounded-full" />
                             <div className="bg-white border border-slate-200 rounded-2xl px-4 py-2">
                                 <div className="flex gap-1">
                                     <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />

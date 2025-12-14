@@ -94,6 +94,23 @@ SUPABASE_URL=your_supabase_url
 SUPABASE_KEY=your_supabase_key
 ```
 
+## Helius / Orb enrichment (backend)
+
+For the MVP the backend (`vialytics-api`) enriches wallet analytics using Helius / Orb to provide
+immediate, user-friendly data such as token balances, NFT ownership and recent activity. This
+enrichment is ephemeral and cached in-process for a short TTL (default 300 seconds). It is merged
+into the analytics JSON under the `external_sources.helius_orb` key.
+
+Configuration:
+- Add `HELIUS_API_KEY` to `vialytics-api/.env`.
+- Optionally set `HELIUS_ORB_URL` to override the API base URL.
+
+Notes:
+- The enrichment is performed by the backend and is intentionally not persisted to the main
+	analytics database to avoid adding long-term storage for external data during the MVP.
+- Caching is in-process (no Redis) to reduce infra complexity for the MVP.
+
+
 ## How It Works
 
 1. User enters their Solana wallet address
@@ -101,6 +118,12 @@ SUPABASE_KEY=your_supabase_key
 3. Analytics engine generates insights (balance, tokens, activity)
 4. Via AI uses this data to answer questions about the wallet
 5. Results are cached in Supabase for faster subsequent loads
+
+## Deployment
+
+We plan to deploy the frontend and backend under the `vialytics.xyz` domain. The domain is reserved
+and will be used for production deployments; environment configuration and DNS/hosting details will
+be added to deployment docs when ready.
 
 ## Development
 

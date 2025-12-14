@@ -35,11 +35,23 @@ export class WalletIntelligence {
     }
 
     // Build system prompt with analytics context
-    let systemPrompt = "You are Via, a friendly AI wallet assistant for Vialytics. Help users understand their Solana wallet analytics in simple, beginner-friendly language. Be concise and helpful.";
+    let systemPrompt = `You are Via, a friendly AI wallet assistant for Vialytics. 
+
+IMPORTANT BEHAVIOR RULES:
+1. Respond naturally to greetings and casual conversation first
+2. Only provide detailed transaction/wallet data when the user explicitly asks for it
+3. Use the wallet analytics as background context, not as automatic information to dump
+4. Be concise, friendly, and helpful
+5. Format your responses clearly with proper markdown (use **bold**, bullet points, etc.)
+
+Examples:
+- User: "Hi" → Respond: "Hey there! 👋 I'm Via, your wallet assistant. How can I help you today?"
+- User: "What's my balance?" → Then provide the balance from context
+- User: "Show me my transactions" → Then provide transaction details`;
 
     if (this.config.analytics) {
       const a = this.config.analytics;
-      systemPrompt += `\n\nWallet Analytics Context:\n`;
+      systemPrompt += `\n\nWallet Analytics Context (use this ONLY when user asks for specific data):\n`;
       systemPrompt += `- Total Balance: $${a.portfolio_overview?.total_balance_usd || 0}\n`;
       systemPrompt += `- Money In: $${a.earnings_spending?.total_received_usd || 0}\n`;
       systemPrompt += `- Money Out: $${a.earnings_spending?.total_sent_usd || 0}\n`;

@@ -6,18 +6,21 @@ import {
     CartesianGrid,
     ResponsiveContainer,
     Tooltip,
+    ReferenceLine,
     XAxis,
     YAxis,
     PieChart,
     Pie,
     Cell
 } from "recharts";
-import { Download, Sparkles, ArrowUpRight, ArrowDownLeft, Activity, Wallet } from "lucide-react";
+import { Download, Sparkles, ArrowUpRight, ArrowDownLeft, Activity, Wallet, SpaceIcon, AtomIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/StatCard";
 import { Via } from "@/components/Via";
 import { SolanaNews } from "@/components/SolanaNews";
+import { Typewriter } from "@/components/Typewriter";
+import LabelInfo from "@/components/LabelInfo";
 
 type TimeRange = "7D" | "1M" | "3M" | "ALL";
 
@@ -26,6 +29,10 @@ export function Dashboard() {
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [timeRange, setTimeRange] = useState<TimeRange>("1M");
+    const [chartActiveName, setChartActiveName] = useState<string | null>(null);
+    const [chartActiveValue, setChartActiveValue] = useState<number | null>(null);
+    const [labelModalOpen, setLabelModalOpen] = useState(false);
+    const [labelModalData, setLabelModalData] = useState<{ label?: string; address?: string }>({});
 
     useEffect(() => {
         const fetchAnalytics = async () => {
@@ -62,6 +69,7 @@ export function Dashboard() {
     const portfolio = data.portfolio_overview;
     const earnings = data.earnings_spending;
     const activity = data.activity_insights;
+    const enrichment = data.external_sources?.helius_orb ?? null;
 
     // Filter chart data by time range
     const filterDataByRange = (monthlyData: Record<string, number>) => {
@@ -85,10 +93,35 @@ export function Dashboard() {
 
     const chartData = filterDataByRange(activity.monthly_frequency);
 
-    const tokenData = portfolio.top_tokens.filter((t: any) => t.amount > 0).map((t: any) => ({
-        name: t.symbol,
-        value: t.amount,
-    }));
+    // Prefer helius normalized token balances when available, fallback to indexer portfolio tokens
+    const tokenData = ((): any[] => {
+        const norm = enrichment?.normalized;
+        if (norm && Array.isArray(norm.token_balances) && norm.token_balances.length > 0) {
+            return norm.token_balances.map((tb: any) => {
+                const mint = tb.mint || "";
+                const symbol = tb.symbol || getTokenLabel(mint);
+                return { name: symbol, value: +(tb.ui_amount || 0), mint };
+            });
+        }
+        return portfolio.top_tokens.filter((t: any) => t.amount > 0).map((t: any) => {
+            const mint = t.mint || "";
+            const symbol = t.symbol || t.token || getTokenLabel(mint);
+            return { name: symbol, value: t.amount, mint };
+        });
+    })();
+
+    // Helper to get token label from mint
+    function getTokenLabel(mint: string): string {
+        const knownTokens: Record<string, string> = {
+            "So11111111111111111111111111111111111111112": "SOL",
+            "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v": "USDC",
+            "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB": "USDT",
+            "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So": "mSOL",
+            "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263": "BONK",
+            "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN": "JUP",
+        };
+        return knownTokens[mint] || (mint.length > 10 ? `${mint.slice(0, 4)}...${mint.slice(-4)}` : mint);
+    }
 
     const COLORS = ['#8b5cf6', '#ec4899', '#f97316', '#06b6d4', '#10b981'];
 
@@ -99,13 +132,13 @@ export function Dashboard() {
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-purple-600 to-orange-500 bg-clip-text text-transparent">
-                            Welcome Cypherpunkie
+                            Welcome, <Typewriter words={["Cypherpunkie", "DeFi Pioneer", "Buildoor", "Crypto Native", "Retar Dio"]} />
                         </h1>
-                        <p className="text-slate-500 mt-2">Your personal crypto command center.</p>
+                        <p className="text-slate-500 mt-2">This is your personal crypto command center.</p>
                     </div>
                     <Button className="gap-2 bg-gradient-to-r from-purple-500 to-orange-400 hover:from-purple-600 hover:to-orange-500 text-white shadow-lg">
-                        <Sparkles size={16} />
-                        Ask Via for Insights
+                        <AtomIcon size={16} />
+                        Generate Insights with Via
                     </Button>
                 </div>
 
@@ -150,7 +183,10 @@ export function Dashboard() {
                     {/* Activity Chart */}
                     <Card className="col-span-12 md:col-span-8 border-none shadow-sm bg-white">
                         <CardHeader className="flex flex-row items-center justify-between">
-                            <CardTitle className="text-slate-700 font-medium">Activity Over Time</CardTitle>
+                            <div>
+                                <CardTitle className="text-slate-700 font-medium">Activity Over Time</CardTitle>
+                                <p className="text-xs text-slate-500">Total transactions: {activity.total_transactions ?? 0}</p>
+                            </div>
                             <div className="flex gap-2">
                                 {(["7D", "1M", "3M", "ALL"] as TimeRange[]).map((range) => (
                                     <button
@@ -169,7 +205,17 @@ export function Dashboard() {
                         <CardContent className="pl-0">
                             <div className="h-[300px] w-full">
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <AreaChart data={chartData}>
+                                    <AreaChart
+                                        data={chartData}
+                                        onMouseMove={(state: any) => {
+                                            if (state && state.activePayload && state.activePayload.length) {
+                                                const payload = state.activePayload[0].payload;
+                                                setChartActiveName(payload.name);
+                                                setChartActiveValue(payload.value);
+                                            }
+                                        }}
+                                        onMouseLeave={() => { setChartActiveName(null); setChartActiveValue(null); }}
+                                    >
                                         <defs>
                                             <linearGradient id="colorActivity" x1="0" y1="0" x2="0" y2="1">
                                                 <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.2} />
@@ -179,13 +225,16 @@ export function Dashboard() {
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                                         <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
                                         <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                                        <Tooltip
-                                            contentStyle={{ backgroundColor: '#fff', border: 'none', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                                            itemStyle={{ color: '#64748b' }}
-                                        />
-                                        <Area type="monotone" dataKey="value" stroke="#8b5cf6" strokeWidth={3} fillOpacity={1} fill="url(#colorActivity)" />
+                                        <Tooltip content={<CustomTooltip />} />
+                                        {chartActiveName && (
+                                            <ReferenceLine x={chartActiveName} stroke="#e9d5ff" strokeWidth={2} strokeDasharray="4 4" />
+                                        )}
+                                        <Area type="monotone" dataKey="value" stroke="#8b5cf6" strokeWidth={3} fillOpacity={1} fill="url(#colorActivity)" dot={{ r: 3 }} activeDot={{ r: 6 }} animationDuration={800} />
                                     </AreaChart>
                                 </ResponsiveContainer>
+                                {chartActiveName && (
+                                    <div className="mt-2 text-sm text-slate-600">Selected: <strong className="text-slate-800">{chartActiveName}</strong> — <span className="font-medium">{chartActiveValue}</span></div>
+                                )}
                             </div>
                         </CardContent>
                     </Card>
@@ -250,12 +299,35 @@ export function Dashboard() {
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
-                                {data.income_streams.top_income_sources.slice(0, 3).map((source: any, i: number) => (
-                                    <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                                        <span className="text-sm font-medium text-slate-700">{source.source}</span>
-                                        <span className="text-sm font-bold text-emerald-600">+${source.value_usd.toLocaleString()}</span>
-                                    </div>
-                                ))}
+                                {(enrichment && enrichment.normalized && enrichment.normalized.top_counterparties) ? (
+                                    (enrichment.normalized.top_counterparties.slice(0, 3)).map((item: any, i: number) => (
+                                        <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                                            <div className="flex items-center gap-2">
+                                                <a className="text-sm font-medium text-slate-700 hover:underline" href={`https://orb.helius.dev/address/${item.address}`} target="_blank" rel="noopener noreferrer">{item.label || (item.address.length > 12 ? `${item.address.slice(0, 6)}...${item.address.slice(-6)}` : item.address)}</a>
+                                                <button onClick={() => { setLabelModalData({ label: item.label, address: item.address }); setLabelModalOpen(true); }} className="text-xs text-slate-400 hover:text-slate-600">What is this?</button>
+                                            </div>
+                                            <span className="text-sm font-bold text-emerald-600">+${(item.usd_volume || 0).toLocaleString()}</span>
+                                        </div>
+                                    ))
+                                ) : (
+                                    data.income_streams.top_income_sources.slice(0, 3).map((source: any, i: number) => {
+                                        const addr = source.source;
+                                        const label = addr.length > 12 ? `${addr.slice(0, 4)}...${addr.slice(-4)}` : addr;
+                                        return (
+                                            <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                                                <a
+                                                    className="text-sm font-medium text-slate-700 hover:underline hover:text-purple-600 transition-colors"
+                                                    href={`https://orb.helius.dev/address/${addr}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    {label}
+                                                </a>
+                                                <span className="text-sm font-bold text-emerald-600">+${source.value_usd.toLocaleString()}</span>
+                                            </div>
+                                        );
+                                    })
+                                )}
                                 {data.income_streams.top_income_sources.length === 0 && (
                                     <p className="text-sm text-slate-400 italic">No income sources identified yet.</p>
                                 )}
@@ -269,12 +341,21 @@ export function Dashboard() {
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
-                                {data.spending_categories.top_spending_categories.map((cat: any, i: number) => (
-                                    <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                                        <span className="text-sm font-medium text-slate-700">{cat.category}</span>
-                                        <span className="text-sm font-bold text-rose-600">-${cat.value_usd.toFixed(2)}</span>
-                                    </div>
-                                ))}
+                                {(enrichment && enrichment.normalized && enrichment.normalized.top_spending_categories && enrichment.normalized.top_spending_categories.length > 0) ? (
+                                    enrichment.normalized.top_spending_categories.slice(0, 3).map((cat: any, i: number) => (
+                                        <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                                            <span className="text-sm font-medium text-slate-700">{cat.category}</span>
+                                            <span className="text-sm font-bold text-rose-600">-${cat.value_usd.toFixed(2)}</span>
+                                        </div>
+                                    ))
+                                ) : (
+                                    data.spending_categories.top_spending_categories.map((cat: any, i: number) => (
+                                        <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                                            <span className="text-sm font-medium text-slate-700">{cat.category}</span>
+                                            <span className="text-sm font-bold text-rose-600">-${cat.value_usd.toFixed(2)}</span>
+                                        </div>
+                                    ))
+                                )}
                                 {data.spending_categories.top_spending_categories.length === 0 && (
                                     <p className="text-sm text-slate-400 italic">No spending categories identified yet.</p>
                                 )}
@@ -297,8 +378,24 @@ export function Dashboard() {
 
             {/* Via Mascot */}
             <Via />
+            <LabelInfo open={labelModalOpen} onClose={() => setLabelModalOpen(false)} label={labelModalData.label} address={labelModalData.address} />
         </div>
     );
 }
 
 export default Dashboard;
+
+// Custom tooltip component for the activity chart
+function CustomTooltip(props: any) {
+    const { active, payload, label } = props;
+    if (!active || !payload || !payload.length) return null;
+
+    const p = payload[0].payload;
+    return (
+        <div className="bg-white p-3 rounded shadow-md text-sm">
+            <div className="text-slate-600">{label}</div>
+            <div className="mt-1 font-medium text-slate-800">{p.value} transactions</div>
+        </div>
+    );
+}
+

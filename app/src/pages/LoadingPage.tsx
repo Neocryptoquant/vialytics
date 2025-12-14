@@ -101,8 +101,8 @@ export function LoadingPage() {
                 <div className="relative inline-block mb-12">
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-orange-500 rounded-full blur-3xl opacity-50 animate-pulse"></div>
                     <Avatar
-                        svg="/mascot.svg"
-                        jpg="/via-mascot.jpg"
+                        svg="/via-svg.svg"
+                        // jpg="/via-mascot.jpg"
                         alt="Via"
                         className="relative w-48 h-48 rounded-full object-cover border-4 border-white shadow-2xl animate-spin-slow"
                         style={{ animation: "spin 20s linear infinite" }}

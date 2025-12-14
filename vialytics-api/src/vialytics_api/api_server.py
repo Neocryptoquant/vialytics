@@ -8,6 +8,8 @@ import threading
 from vialytics_api.services.analytics import WalletAnalyzer
 from vialytics_api.services.supabase_service import get_supabase
 from vialytics_api.services.indexer_service import get_indexer
+from vialytics_api.services.helius_client import get_default_client
+from fastapi.concurrency import run_in_threadpool
 
 app = FastAPI(title="Vialytics API")
 
@@ -118,33 +120,31 @@ async def get_analytics_by_wallet(wallet_address: str) -> Dict[str, Any]:
         raise HTTPException(status_code=404, detail="Wallet not indexed yet. Please start indexing.")
     
     analyzer = WalletAnalyzer(db_path=db_path)
-    return analyzer.analyze()
+    base = analyzer.analyze()
 
-@app.get("/api/analytics/{wallet_address}")
-async def get_analytics_by_wallet(wallet_address: str) -> Dict[str, Any]:
-    """Get analytics for a specific wallet"""
-    # TODO: Check Supabase cache first
-    # For now, check if wallet.db exists for this wallet
+    # Enrich with Helius/Orb data (ephemeral cache)
+    try:
+        client = get_default_client()
+        enrichment = await run_in_threadpool(client.fetch_enrichment, wallet_address)
+        if enrichment:
+            base.setdefault("external_sources", {})["helius_orb"] = enrichment
+    except Exception as e:
+        print(f"Helius enrichment error: {e}")
+
+    return base
+
+@app.get("/api/enrichment/{wallet_address}")
+async def get_enrichment(wallet_address: str) -> Dict[str, Any]:
+    """Get Helius enrichment data for a wallet (token balances, NFTs, labels)."""
+    if not (32 <= len(wallet_address) <= 44):
+        raise HTTPException(status_code=400, detail="Invalid wallet address")
     
-    db_path = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))),
-        "vialytics-core",
-        f"{wallet_address}.db"
-    )
-    
-    if not os.path.exists(db_path):
-        # Try default wallet.db
-        db_path = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))),
-            "vialytics-core",
-            "wallet.db"
-        )
-        
-        if not os.path.exists(db_path):
-            raise HTTPException(status_code=404, detail="Wallet not found. Please index first.")
-    
-    analyzer = WalletAnalyzer(db_path=db_path)
-    return analyzer.analyze()
+    try:
+        client = get_default_client()
+        enrichment = await run_in_threadpool(client.fetch_enrichment, wallet_address)
+        return enrichment
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Enrichment failed: {e}")
 
 @app.get("/api/analytics")
 async def get_analytics() -> Dict[str, Any]:

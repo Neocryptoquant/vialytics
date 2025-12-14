@@ -4,6 +4,7 @@ import { Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Avatar from "@/components/ui/avatar";
+import { Typewriter } from "@/components/Typewriter";
 
 export function LandingPage() {
     const [walletAddress, setWalletAddress] = useState("");
@@ -58,7 +59,7 @@ export function LandingPage() {
 
                     {/* Via Mascot - Simplified */}
                     <div className="flex justify-center mb-6">
-                        <Avatar svg="/mascot.svg" jpg="/via-mascot.jpg" alt="Via" className="w-32 h-32 rounded-full object-cover shadow-xl" />
+                        <Avatar svg="/via-svg.svg" jpg="/via-mascot.jpg" alt="Via" className="w-32 h-32 rounded-full object-cover shadow-xl" />
                     </div>
 
                     {/* Title */}
@@ -67,24 +68,38 @@ export function LandingPage() {
                             Vialytics
                         </h1>
                         <p className="text-slate-600">
-                            Your personal Solana wallet analytics companion
+                            Your personal Solana data analyst
                         </p>
                     </div>
 
                     {/* Wallet Input */}
                     <div className="space-y-4">
-                        <Input
-                            type="text"
-                            value={walletAddress}
-                            onChange={(e) => {
-                                setWalletAddress(e.target.value);
-                                setError("");
-                            }}
-                            onKeyPress={(e) => e.key === "Enter" && handleAnalyze()}
-                            placeholder="Enter your Solana wallet address..."
-                            className="h-14 px-4 text-base"
-                            disabled={loading}
-                        />
+                        <div className="relative">
+                            <Input
+                                type="text"
+                                value={walletAddress}
+                                onChange={(e) => setWalletAddress(e.target.value)}
+                                onKeyPress={(e) => e.key === "Enter" && handleAnalyze()}
+                                placeholder=""
+                                className="h-14 px-4 text-base"
+                                disabled={loading}
+                            />
+                            {!walletAddress && (
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                    <Typewriter
+                                        words={[
+                                            "Enter your Solana wallet address...",
+                                            "Paste your wallet here...",
+                                            "Drop your address to analyze...",
+                                            "Start exploring your transactions..."
+                                        ]}
+                                        typingSpeed={80}
+                                        deletingSpeed={40}
+                                        delayBetweenWords={3000}
+                                    />
+                                </div>
+                            )}
+                        </div>
                         {error && (
                             <p className="text-red-500 text-sm">{error}</p>
                         )}
@@ -102,15 +117,17 @@ export function LandingPage() {
                                 </>
                             ) : (
                                 <>
-                                    <Sparkles className="mr-2 h-5 w-5" />
-                                    Analyze My Wallet
+                                    {/* <Sparkles className="mr-2 h-5 w-5" /> */}
+                                    Hey Via! Can you analyze My Wallet?
                                 </>
                             )}
                         </Button>
 
                         {/* Info Text */}
                         <p className="text-center text-sm text-slate-500">
-                            We analyze your transactions to give you beginner-friendly insights
+                            {/* We analyze your transactions to give you beginner-friendly insights */}
+                            {/* Vialytics makes your analytics simple again  */}
+                            Business Intelligence at your fingertips
                         </p>
                     </div>
                 </div>

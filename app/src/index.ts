@@ -5,8 +5,13 @@ const server = serve({
   routes: {
     // Static assets from `public/` (serve these before the catch-all index route)
     "/logo.svg": Bun.file("./public/logo.svg"),
+    "/logo-vialytics.svg": Bun.file("./public/logo-vialytics.svg"),
+    "/vialyticsSvg.svg": Bun.file("./public/vialyticsSvg.svg"),
+    "/poweredByHelius.svg": Bun.file("./public/poweredByHelius.svg"),
     "/mascot.svg": Bun.file("./public/mascot.svg"),
+    "/via-svg.svg": Bun.file("./public/via-svg.svg"),
     "/via-mascot.jpg": Bun.file("./public/via-mascot.jpg"),
+    "/via-mascot.svg": Bun.file("./public/via-mascot.svg"),
     "/vialytics-logo.jpg": Bun.file("./public/vialytics-logo.jpg"),
     "/logo-vialytics.jpg": Bun.file("./public/logo-vialytics.jpg"),
 
