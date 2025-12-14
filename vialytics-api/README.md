@@ -29,13 +29,14 @@ HELIUS_API_KEY=your-key-here
 
 ```bash
 cd vialytics-api
+source venv/bin/activate
 python -m vialytics_api.api_server
 ```
 
 3. Request analytics for a wallet:
 
 ```bash
-curl http://localhost:8000/api/analytics/2QkJLTKTtYFHS6xir1TEXLSdajM7r1Djf96JogKnRGSR
+curl http://localhost:8000/api/analytics/
 ```
 
 The returned JSON will include an `external_sources.helius_orb` key when enrichment succeeds.
