@@ -21,6 +21,7 @@ import { Via } from "@/components/Via";
 import { SolanaNews } from "@/components/SolanaNews";
 import { Typewriter } from "@/components/Typewriter";
 import LabelInfo from "@/components/LabelInfo";
+import { endpoints } from "@/lib/api";
 
 type TimeRange = "7D" | "1M" | "3M" | "ALL";
 
@@ -39,7 +40,7 @@ export function Dashboard() {
             if (!wallet) return;
 
             try {
-                const response = await fetch(`http://localhost:8000/api/analytics/${wallet}`);
+                const response = await fetch(endpoints.analytics(wallet));
                 if (!response.ok) {
                     throw new Error("Failed to fetch analytics");
                 }

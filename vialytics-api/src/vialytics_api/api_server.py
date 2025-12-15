@@ -7,15 +7,24 @@ import threading
 
 from vialytics_api.services.analytics import WalletAnalyzer
 from vialytics_api.services.supabase_service import get_supabase
-from vialytics_api.services.indexer_service import get_indexer
+from vialytics_api.services.indexer_service import get_indexer, DATA_DIR
 from vialytics_api.services.helius_client import get_default_client
 from fastapi.concurrency import run_in_threadpool
 
 app = FastAPI(title="Vialytics API")
 
+# CORS configuration - allow vialytics.xyz and localhost for dev
+ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://vialytics.xyz",
+    "https://www.vialytics.xyz",
+    "https://*.vercel.app",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -101,7 +110,11 @@ async def get_index_status(job_id: str) -> JobStatus:
 
 @app.get("/api/analytics/{wallet_address}")
 async def get_analytics_by_wallet(wallet_address: str) -> Dict[str, Any]:
-    """Get analytics for a specific wallet"""
+    """Get analytics for a specific wallet with Helius-only fallback for MVP"""
+    
+    # Validate wallet address
+    if not (32 <= len(wallet_address) <= 44):
+        raise HTTPException(status_code=400, detail="Invalid wallet address")
     
     # Check Supabase cache first
     if supabase.client:
@@ -109,29 +122,50 @@ async def get_analytics_by_wallet(wallet_address: str) -> Dict[str, Any]:
         if cached:
             return cached
     
-    # Check if wallet.db exists
-    db_path = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))),
-        "vialytics-core",
-        "wallet.db"
-    )
+    # Per-wallet database path
+    db_path = os.path.join(DATA_DIR, f"{wallet_address}.db")
     
-    if not os.path.exists(db_path):
-        raise HTTPException(status_code=404, detail="Wallet not indexed yet. Please start indexing.")
+    # Initialize response with basic wallet info
+    result: Dict[str, Any] = {
+        "wallet_address": wallet_address,
+        "data_source": "helius",  # Track data source for debugging
+    }
     
-    analyzer = WalletAnalyzer(db_path=db_path)
-    base = analyzer.analyze()
-
-    # Enrich with Helius/Orb data (ephemeral cache)
+    # Try to get indexed data first
+    if os.path.exists(db_path):
+        try:
+            analyzer = WalletAnalyzer(db_path=db_path)
+            indexed_data = analyzer.analyze()
+            result.update(indexed_data)
+            result["data_source"] = "indexed"
+        except Exception as e:
+            print(f"Indexed analytics error: {e}")
+    
+    # Always enrich with Helius/Orb data (this is our primary source for MVP)
     try:
         client = get_default_client()
         enrichment = await run_in_threadpool(client.fetch_enrichment, wallet_address)
         if enrichment:
-            base.setdefault("external_sources", {})["helius_orb"] = enrichment
+            result.setdefault("external_sources", {})["helius_orb"] = enrichment
+            
+            # If we don't have indexed data, build analytics from Helius data
+            if result.get("data_source") == "helius":
+                normalized = enrichment.get("normalized", {})
+                result["portfolio_overview"] = {
+                    "total_balance_usd": sum(t.get("usd_value", 0) for t in normalized.get("token_balances", [])),
+                    "token_count": len(normalized.get("token_balances", [])),
+                    "nft_count": len(normalized.get("nfts", [])),
+                }
+                result["activity_insights"] = {
+                    "top_counterparties": normalized.get("top_counterparties", [])[:5],
+                }
     except Exception as e:
         print(f"Helius enrichment error: {e}")
+        # If Helius fails and we have no indexed data, return error
+        if result.get("data_source") == "helius" and "portfolio_overview" not in result:
+            raise HTTPException(status_code=503, detail="Unable to fetch wallet data. Please try again.")
 
-    return base
+    return result
 
 @app.get("/api/enrichment/{wallet_address}")
 async def get_enrichment(wallet_address: str) -> Dict[str, Any]:
@@ -148,18 +182,8 @@ async def get_enrichment(wallet_address: str) -> Dict[str, Any]:
 
 @app.get("/api/analytics")
 async def get_analytics() -> Dict[str, Any]:
-    """Get analytics for default wallet (legacy endpoint)"""
-    db_path = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))),
-        "vialytics-core",
-        "wallet.db"
-    )
-    
-    if not os.path.exists(db_path):
-        raise HTTPException(status_code=404, detail="No wallet data found")
-    
-    analyzer = WalletAnalyzer(db_path=db_path)
-    return analyzer.analyze()
+    """Get analytics for default wallet (legacy endpoint) - redirects to Helius-only mode"""
+    raise HTTPException(status_code=400, detail="Please use /api/analytics/{wallet_address} endpoint")
 
 @app.post("/api/chat")
 async def chat(request: ChatRequest) -> ChatResponse:

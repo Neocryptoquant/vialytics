@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import Avatar from "@/components/ui/avatar";
+import { endpoints } from "@/lib/api";
 
 export function LoadingPage() {
     const { wallet } = useParams<{ wallet: string }>();
@@ -28,7 +29,7 @@ export function LoadingPage() {
         // Start indexing
         const startIndexing = async () => {
             try {
-                const response = await fetch("http://localhost:8000/api/index", {
+                const response = await fetch(endpoints.index(), {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ wallet_address: wallet })
@@ -53,7 +54,7 @@ export function LoadingPage() {
         // Poll for status
         const interval = setInterval(async () => {
             try {
-                const response = await fetch(`http://localhost:8000/api/index/status/${jobId}`);
+                const response = await fetch(endpoints.indexStatus(jobId));
                 const data = await response.json();
 
                 setProgress(data.progress || 0);

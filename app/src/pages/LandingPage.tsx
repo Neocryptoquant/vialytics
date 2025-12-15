@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Avatar from "@/components/ui/avatar";
 import { Typewriter } from "@/components/Typewriter";
+import { endpoints } from "@/lib/api";
 
 export function LandingPage() {
     const [walletAddress, setWalletAddress] = useState("");
@@ -35,7 +36,7 @@ export function LandingPage() {
 
         try {
             // Check if analytics already exist in cache
-            const cacheResponse = await fetch(`http://localhost:8000/api/analytics/${walletAddress}`);
+            const cacheResponse = await fetch(endpoints.analytics(walletAddress));
 
             if (cacheResponse.ok) {
                 // Analytics exist, go straight to dashboard

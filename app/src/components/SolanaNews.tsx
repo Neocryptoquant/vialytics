@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ExternalLink, Clock } from "lucide-react";
+import { endpoints } from "@/lib/api";
 
 interface NewsItem {
     title: string;
@@ -17,7 +18,7 @@ export function SolanaNews() {
     useEffect(() => {
         const fetchNews = async () => {
             try {
-                const response = await fetch("http://localhost:8000/api/news");
+                const response = await fetch(endpoints.news());
                 const data = await response.json();
                 setNews(data.news || []);
             } catch (error) {

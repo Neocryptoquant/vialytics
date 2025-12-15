@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { WalletIntelligence } from "@/lib/ai-pipe";
 import Avatar from "@/components/ui/avatar";
 import { FormattedText } from "@/components/FormattedText";
+import { endpoints } from "@/lib/api";
 
 interface Message {
     role: "user" | "assistant";
@@ -30,7 +31,7 @@ export function Via() {
                 // Try to get wallet from URL
                 const wallet = window.location.pathname.split('/').pop();
                 if (wallet && wallet.length > 20) {
-                    const response = await fetch(`http://localhost:8000/api/analytics/${wallet}`);
+                    const response = await fetch(endpoints.analytics(wallet));
                     if (response.ok) {
                         const data = await response.json();
                         setAnalytics(data);
@@ -110,7 +111,7 @@ export function Via() {
                     isOpen && "scale-0"
                 )}
             >
-                    <Avatar svg="/via-mascot.svg" jpg="/via-mascot.jpg" alt="Via" className="w-14 h-14 rounded-full object-cover border-2 border-white" />
+                <Avatar svg="/via-mascot.svg" jpg="/via-mascot.jpg" alt="Via" className="w-14 h-14 rounded-full object-cover border-2 border-white" />
                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse" />
             </button>
 
@@ -123,7 +124,7 @@ export function Via() {
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-purple-500 to-orange-400">
                     <div className="flex items-center gap-3">
-                            <Avatar svg="/via-mascot.svg" jpg="/via-mascot.jpg" alt="Via" className="w-10 h-10 rounded-full border-2 border-white" />
+                        <Avatar svg="/via-mascot.svg" jpg="/via-mascot.jpg" alt="Via" className="w-10 h-10 rounded-full border-2 border-white" />
                         <div>
                             <h3 className="font-bold text-white">Chat with Via</h3>
                             <p className="text-xs text-white/80">Your AI Wallet Assistant</p>
