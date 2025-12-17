@@ -60,7 +60,7 @@ Examples:
       systemPrompt += `- Total Transactions: ${a.activity_insights?.total_transactions || 0}\n`;
 
       if (a.portfolio_overview?.top_tokens?.length > 0) {
-        systemPrompt += `- Top Tokens: ${a.portfolio_overview.top_tokens.slice(0, 3).map((t: any) => `${t.symbol} ($${t.value_usd.toFixed(2)})`).join(', ')}\n`;
+        systemPrompt += `- Top Tokens: ${a.portfolio_overview.top_tokens.slice(0, 3).map((t: any) => `${t.symbol} ($${(Number(t.value_usd) || 0).toFixed(2)})`).join(', ')}\n`;
       }
     }
 

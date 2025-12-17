@@ -48,7 +48,7 @@ timeout = 10
 
 [vialytics]
 rpc_url = "{RPC_URL}"
-db_url = "sqlite:{db_path}"
+db_url = "sqlite://{db_path}"
 
 [pipeline]
 """
@@ -119,7 +119,11 @@ db_url = "sqlite:{db_path}"
                     if "Finished fetching history" in buffer:
                         print(f"[{job_id}] History fetch complete. Stopping indexer.")
                         completed = True
-                        process.kill()
+                        process.terminate() # Graceful shutdown for WAL flush
+                        try:
+                            process.wait(timeout=5)
+                        except subprocess.TimeoutExpired:
+                            process.kill()
                         break
             
             output_thread = threading.Thread(target=read_output)
