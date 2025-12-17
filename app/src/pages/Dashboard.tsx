@@ -188,7 +188,7 @@ export function Dashboard() {
                         <CardHeader className="flex flex-row items-center justify-between">
                             <div>
                                 <CardTitle className="text-slate-700 font-medium">Activity Over Time</CardTitle>
-                                <p className="text-xs text-slate-500">Total transactions: {activity.total_transactions ?? 0}</p>
+                                <p className="text-xs text-slate-500">Total transactions: {activity?.total_transactions ?? 0}</p>
                             </div>
                             <div className="flex gap-2">
                                 {(["7D", "1M", "3M", "ALL"] as TimeRange[]).map((range) => (
@@ -352,14 +352,14 @@ export function Dashboard() {
                                         </div>
                                     ))
                                 ) : (
-                                    data.spending_categories.top_spending_categories.map((cat: any, i: number) => (
+                                    (data.spending_categories?.top_spending_categories || []).map((cat: any, i: number) => (
                                         <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                                             <span className="text-sm font-medium text-slate-700">{cat.category}</span>
                                             <span className="text-sm font-bold text-rose-600">-${cat.value_usd.toFixed(2)}</span>
                                         </div>
                                     ))
                                 )}
-                                {data.spending_categories.top_spending_categories.length === 0 && (
+                                {(data.spending_categories?.top_spending_categories?.length || 0) === 0 && (
                                     <p className="text-sm text-slate-400 italic">No spending categories identified yet.</p>
                                 )}
                             </div>
