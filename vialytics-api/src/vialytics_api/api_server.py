@@ -128,7 +128,7 @@ async def get_analytics_by_wallet(wallet_address: str) -> Dict[str, Any]:
             return cached
     
     # Per-wallet database path
-    db_path = os.path.join(DATA_DIR, f"{wallet_address}.db")
+    db_path = os.path.join(DATA_DIR, f"wallet_{wallet_address}.db")
     
     # Initialize response with basic wallet info
     result: Dict[str, Any] = {
