@@ -131,11 +131,17 @@ const result = await Bun.build({
   sourcemap: "linked",
   define: {
     "process.env.NODE_ENV": JSON.stringify("production"),
+    "import.meta.env.VITE_API_URL": JSON.stringify(process.env.VITE_API_URL || ""),
   },
   ...cliConfig,
 });
 
 const end = performance.now();
+
+if (existsSync("public")) {
+  console.log("📂 Copying public assets...");
+  await Bun.spawn(["cp", "-r", "public/.", outdir]).exited;
+}
 
 const outputTable = result.outputs.map(output => ({
   File: path.relative(process.cwd(), output.path),

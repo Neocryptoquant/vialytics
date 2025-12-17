@@ -106,7 +106,7 @@ export function Dashboard() {
                 return { name: symbol, value: +(tb.ui_amount || 0), mint };
             });
         }
-        return portfolio.top_tokens.filter((t: any) => t.amount > 0).map((t: any) => {
+        return (portfolio?.top_tokens || []).filter((t: any) => t.amount > 0).map((t: any) => {
             const mint = t.mint || "";
             const symbol = t.symbol || t.token || getTokenLabel(mint);
             return { name: symbol, value: t.amount, mint };
