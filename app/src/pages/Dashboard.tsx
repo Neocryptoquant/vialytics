@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
     Area,
     AreaChart,
@@ -27,6 +27,7 @@ type TimeRange = "7D" | "1M" | "3M" | "ALL";
 
 export function Dashboard() {
     const { wallet } = useParams<{ wallet: string }>();
+    const navigate = useNavigate();
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [timeRange, setTimeRange] = useState<TimeRange>("1M");
@@ -45,6 +46,13 @@ export function Dashboard() {
                     throw new Error("Failed to fetch analytics");
                 }
                 const result = await response.json();
+
+                // If data is only from Helius (not indexed), redirect to loading/indexer
+                if (result.source === "helius" || result.data_source === "helius") {
+                    navigate(`/loading/${wallet}`);
+                    return;
+                }
+
                 setData(result);
             } catch (error) {
                 console.error("Failed to fetch analytics:", error);
