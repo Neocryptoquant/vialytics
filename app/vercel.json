@@ -24,9 +24,6 @@
             "destination": "https://vialytics-production.up.railway.app/api/:path*"
         },
         {
-            "handle": "filesystem"
-        },
-        {
             "source": "/(.*)",
             "destination": "/index.html"
         }
