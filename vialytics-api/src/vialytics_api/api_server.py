@@ -13,6 +13,11 @@ from fastapi.concurrency import run_in_threadpool
 
 app = FastAPI(title="Vialytics API")
 
+@app.get("/health")
+async def health_check():
+    """Simple health check endpoint for Railway"""
+    return {"status": "healthy", "service": "vialytics-api"}
+
 # CORS configuration - allow vialytics.xyz and localhost for dev
 ALLOWED_ORIGINS = [
     "http://localhost:3000",
@@ -231,4 +236,5 @@ async def get_solana_news():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
