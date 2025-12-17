@@ -1,9 +1,9 @@
 use std::str::FromStr;
 
 use solana_transaction_status::{
-    EncodedConfirmedTransactionWithStatusMeta, option_serializer::OptionSerializer,
+    option_serializer::OptionSerializer, EncodedConfirmedTransactionWithStatusMeta,
 };
-use sqlx::{Pool, Sqlite, sqlite::SqlitePoolOptions};
+use sqlx::{sqlite::SqlitePoolOptions, Pool, Sqlite};
 
 /// 0xAbim: This db module provides functions to connect to a SQLite database, run migrations,
 /// save transaction data, and process confirmed transactions to extract and store token movements.
@@ -23,8 +23,9 @@ pub async fn connect(db_url: &str) -> Pool<Sqlite> {
 }
 
 pub async fn run_migrations(pool: &Pool<Sqlite>) {
-    let migrator = include_str!("../../migrations.sql");
+    let migrator = include_str!("../migrations.sql");
     for statement in migrator.split(";") {
+        let statement: &str = statement;
         if !statement.trim().is_empty() {
             sqlx::query(statement)
                 .execute(pool)
