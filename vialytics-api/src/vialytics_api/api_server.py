@@ -156,17 +156,29 @@ async def get_analytics_by_wallet(wallet_address: str) -> Dict[str, Any]:
             # If we don't have indexed data, build analytics from Helius data
             if result.get("data_source") == "helius":
                 normalized = enrichment.get("normalized", {})
+                token_balances = normalized.get("token_balances", [])
+                
+                # Build complete structure expected by frontend
                 result["portfolio_overview"] = {
-                    "total_balance_usd": sum(t.get("usd_value", 0) for t in normalized.get("token_balances", [])),
-                    "token_count": len(normalized.get("token_balances", [])),
+                    "total_balance_usd": sum(t.get("usd_value", 0) for t in token_balances),
+                    "token_count": len(token_balances),
                     "nft_count": len(normalized.get("nfts", [])),
+                    "top_tokens": token_balances[:5] if token_balances else [],
+                }
+                result["earnings_spending"] = {
+                    "total_received_usd": 0,
+                    "total_sent_usd": 0,
+                    "net_flow": 0,
                 }
                 result["activity_insights"] = {
+                    "total_transactions": len(enrichment.get("transactions", [])),
+                    "active_days_count": 0,
+                    "monthly_frequency": {},  # Empty dict instead of None
                     "top_counterparties": normalized.get("top_counterparties", [])[:5],
                 }
     except Exception as e:
         print(f"Helius enrichment error: {e}")
-        # If Helius fails and we have no indexed data, return error
+        # If Helius fails and we have no indexed data, return minimal structure
         if result.get("data_source") == "helius" and "portfolio_overview" not in result:
             raise HTTPException(status_code=503, detail="Unable to fetch wallet data. Please try again.")
 
