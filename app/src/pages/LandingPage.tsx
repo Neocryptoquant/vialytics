@@ -39,9 +39,15 @@ export function LandingPage() {
             const cacheResponse = await fetch(endpoints.analytics(walletAddress));
 
             if (cacheResponse.ok) {
-                // Analytics exist, go straight to dashboard
-                navigate(`/dashboard/${walletAddress}`);
-                return;
+                const data = await cacheResponse.json();
+
+                // If we have fully indexed data, go to dashboard
+                if (data.data_source === "indexed") {
+                    navigate(`/dashboard/${walletAddress}`);
+                    return;
+                }
+                // If data_source is 'helius', it means we only have basic data.
+                // Fall through to loading page to trigger full indexing.
             }
 
             // Need to index - go to loading page

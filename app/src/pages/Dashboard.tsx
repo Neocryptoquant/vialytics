@@ -313,7 +313,7 @@ export function Dashboard() {
                                         </div>
                                     ))
                                 ) : (
-                                    data.income_streams.top_income_sources.slice(0, 3).map((source: any, i: number) => {
+                                    (data.income_streams?.top_income_sources || []).slice(0, 3).map((source: any, i: number) => {
                                         const addr = source.source;
                                         const label = addr.length > 12 ? `${addr.slice(0, 4)}...${addr.slice(-4)}` : addr;
                                         return (
@@ -331,7 +331,7 @@ export function Dashboard() {
                                         );
                                     })
                                 )}
-                                {data.income_streams.top_income_sources.length === 0 && (
+                                {(data.income_streams?.top_income_sources?.length || 0) === 0 && !(enrichment && enrichment.normalized && enrichment.normalized.top_counterparties) && (
                                     <p className="text-sm text-slate-400 italic">No income sources identified yet.</p>
                                 )}
                             </div>
