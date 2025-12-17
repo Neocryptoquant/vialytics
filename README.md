@@ -2,9 +2,12 @@
 
 Your personal Solana wallet analytics companion powered by AI.
 
+**Live at [vialytics.xyz](https://vialytics.xyz)**
+Aims to be the business intelligence tool for Solana Maxis.
+
 ## What is this?
 
-Vialytics helps you understand your Solana wallet activity in plain English. Instead of staring at transaction hashes and token addresses, just ask Via - our AI assistant - about your wallet and get beginner-friendly insights.
+Vialytics helps you understand your Solana wallet activity in plain English. Instead of staring at transaction hashes and token addresses, just ask Via - our AI assistant - about your wallet and get friendly insights.
 
 ## Features
 
@@ -136,10 +139,7 @@ The project uses:
 Environment variables are injected via `/api/config` endpoint to work with Bun's runtime.
 
 ## Known Issues
-
-- Mascot image may not load due to public folder caching
 - Indexer needs vialytics-core binary built or cargo available
-- Analytics are currently simulated - real indexer integration pending
 
 ## License
 
