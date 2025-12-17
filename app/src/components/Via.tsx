@@ -18,7 +18,7 @@ interface Message {
 export function Via() {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([
-        { role: "assistant", content: "Hey there! I'm Via 👋 Ask me anything about your wallet!" }
+        { role: "assistant", content: "Hey there! I'm Via - Ask me anything about your wallet!" }
     ]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
@@ -63,8 +63,8 @@ export function Via() {
         }
 
         // Debug logging
-        console.log("🔍 Sending message:", userMessage.content);
-        console.log("🔑 API Key:", apiKey ? "Loaded ✅" : "Missing ❌");
+        console.log("[Via] Sending message:", userMessage.content);
+        console.log("[Via] API Key:", apiKey ? "Loaded" : "Missing");
 
         if (!apiKey) {
             setMessages(prev => [...prev, {
@@ -83,13 +83,13 @@ export function Via() {
                 analytics: analytics // Pass analytics as context
             });
 
-            console.log("📞 Calling AI...");
+            console.log("[Via] Calling AI...");
             const response = await ai.chat([...messages, userMessage]);
-            console.log("✅ AI Response:", response);
+            console.log("[Via] AI Response:", response);
 
             setMessages(prev => [...prev, { role: "assistant", content: response }]);
         } catch (error) {
-            console.error("❌ AI Error:", error);
+            console.error("[Via] AI Error:", error);
             setMessages(prev => [...prev, {
                 role: "assistant",
                 content: "Oops! Error calling Groq API. Check console for details."

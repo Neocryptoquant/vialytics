@@ -1,12 +1,11 @@
-# Multi-stage Dockerfile for Vialytics API + Core
-# Based on wrapped-worker's proven Railway deployment
+# Railway Dockerfile for Vialytics Backend
+# Place at repo root so it can access both vialytics-api and vialytics-core
 
 # ============================================
 # Stage 1: Build Rust vialytics-core binary
 # ============================================
 FROM rustlang/rust:nightly-bullseye as rust-builder
 
-# Install system dependencies for Solana SDK
 RUN apt-get update && apt-get install -y \
     pkg-config \
     libudev-dev \
@@ -16,11 +15,8 @@ RUN apt-get update && apt-get install -y \
     clang
 
 WORKDIR /app
+COPY vialytics-core ./vialytics-core
 
-# Copy the Rust core engine source
-COPY ../vialytics-core /app/vialytics-core
-
-# Build the release binary with nightly features
 WORKDIR /app/vialytics-core
 RUN cargo build --release
 
@@ -29,7 +25,6 @@ RUN cargo build --release
 # ============================================
 FROM python:3.11-slim
 
-# Install system runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libudev-dev \
     libssl-dev \
@@ -41,23 +36,20 @@ WORKDIR /app
 # Install poetry
 RUN pip install --no-cache-dir poetry
 
-# Copy dependency files
-COPY pyproject.toml poetry.lock ./
-
-# Install dependencies (no dev)
+# Copy and install Python deps
+COPY vialytics-api/pyproject.toml vialytics-api/poetry.lock ./
 RUN poetry config virtualenvs.create false && \
     poetry install --only main --no-interaction --no-ansi
 
-# Copy Python source code
-COPY src/ ./src/
+# Copy Python source
+COPY vialytics-api/src ./src
 
-# Copy the compiled Rust binary from rust-builder stage
+# Copy compiled Rust binary
 COPY --from=rust-builder /app/vialytics-core/target/release/vialytics-core /vialytics-core/target/release/vialytics-core
 
-# Create data directory for SQLite databases
+# Create data directory
 RUN mkdir -p /data /vialytics-core
 
-# Environment configuration
 ENV VIALYTICS_DATA_DIR=/data
 ENV PORT=8000
 ENV PYTHONUNBUFFERED=1
@@ -65,5 +57,4 @@ ENV PYTHONPATH=/app/src
 
 EXPOSE 8000
 
-# Run the API server
 CMD ["python", "-m", "vialytics_api.api_server"]

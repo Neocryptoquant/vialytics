@@ -133,7 +133,7 @@ export function LoadingPage() {
                 {/* Fun Fact */}
                 <div className="mt-12 p-6 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10">
                     <p className="text-white/70 text-sm italic">
-                        💡 Did you know? Via analyzes your wallet in real-time to give you insights
+                        Did you know? Via analyzes your wallet in real-time to give you insights
                         that even crypto experts would envy.
                     </p>
                 </div>

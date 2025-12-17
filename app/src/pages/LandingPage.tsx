@@ -135,7 +135,7 @@ export function LandingPage() {
 
                 {/* Footer */}
                 <div className="text-center mt-6 text-slate-400 text-sm">
-                    Powered by Solana • Built with ❤️ by the Vialytics team
+                    Powered by Solana | Built by the Vialytics team
                 </div>
             </div>
         </div>
