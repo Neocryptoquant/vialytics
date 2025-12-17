@@ -62,6 +62,11 @@ export function Via() {
             console.error("Failed to fetch config:", error);
         }
 
+        // Fallback to client-side env var if not found in backend
+        if (!apiKey) {
+            apiKey = import.meta.env.VITE_GROQ_API_KEY || import.meta.env.VITE_GEMINI_API_KEY || "";
+        }
+
         // Debug logging
         console.log("[Via] Sending message:", userMessage.content);
         console.log("[Via] API Key:", apiKey ? "Loaded" : "Missing");

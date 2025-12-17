@@ -16,7 +16,7 @@ from vialytics_api.services.label_service import get_label_service
 
 HELIUS_API_KEY = os.environ.get("HELIUS_API_KEY")
 # 0xAbim: correct Helius base URL
-HELIUS_BASE = os.environ.get("HELIUS_ORB_URL", "https://api-mainnet.helius-rpc.com")
+HELIUS_BASE = os.environ.get("HELIUS_ORB_URL", "https://mainnet.helius-rpc.com")
 
 logger = logging.getLogger(__name__)
 
