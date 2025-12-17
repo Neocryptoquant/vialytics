@@ -136,7 +136,7 @@ async def get_analytics_by_wallet(wallet_address: str) -> Dict[str, Any]:
         "data_source": "helius",  # Track data source for debugging
     }
     
-    # Try to get indexed data first
+    # Try to get indexed data first (for transaction history, earnings, etc)
     if os.path.exists(db_path):
         try:
             analyzer = WalletAnalyzer(db_path=db_path)
@@ -146,25 +146,26 @@ async def get_analytics_by_wallet(wallet_address: str) -> Dict[str, Any]:
         except Exception as e:
             print(f"Indexed analytics error: {e}")
     
-    # Always enrich with Helius/Orb data (this is our primary source for MVP)
+    # Always enrich with Helius/Orb data (this provides real-time balances)
     try:
         client = get_default_client()
         enrichment = await run_in_threadpool(client.fetch_enrichment, wallet_address)
         if enrichment:
             result.setdefault("external_sources", {})["helius_orb"] = enrichment
             
-            # If we don't have indexed data, build analytics from Helius data
+            normalized = enrichment.get("normalized", {})
+            token_balances = normalized.get("token_balances", [])
+            
+            # ALWAYS use Helius for real-time portfolio data (more accurate)
+            result["portfolio_overview"] = {
+                "total_balance_usd": sum(t.get("usd_value", 0) for t in token_balances),
+                "token_count": len(token_balances),
+                "nft_count": len(normalized.get("nfts", [])),
+                "top_tokens": token_balances[:5] if token_balances else [],
+            }
+            
+            # If we don't have indexed data, also build earnings/activity from Helius
             if result.get("data_source") == "helius":
-                normalized = enrichment.get("normalized", {})
-                token_balances = normalized.get("token_balances", [])
-                
-                # Build complete structure expected by frontend
-                result["portfolio_overview"] = {
-                    "total_balance_usd": sum(t.get("usd_value", 0) for t in token_balances),
-                    "token_count": len(token_balances),
-                    "nft_count": len(normalized.get("nfts", [])),
-                    "top_tokens": token_balances[:5] if token_balances else [],
-                }
                 result["earnings_spending"] = {
                     "total_received_usd": 0,
                     "total_sent_usd": 0,
@@ -173,7 +174,7 @@ async def get_analytics_by_wallet(wallet_address: str) -> Dict[str, Any]:
                 result["activity_insights"] = {
                     "total_transactions": len(enrichment.get("transactions", [])),
                     "active_days_count": 0,
-                    "monthly_frequency": {},  # Empty dict instead of None
+                    "monthly_frequency": {},
                     "top_counterparties": normalized.get("top_counterparties", [])[:5],
                 }
     except Exception as e:

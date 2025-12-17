@@ -215,34 +215,40 @@ export function Dashboard() {
                         </CardHeader>
                         <CardContent className="pl-0">
                             <div className="h-[300px] w-full">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <AreaChart
-                                        data={chartData}
-                                        onMouseMove={(state: any) => {
-                                            if (state && state.activePayload && state.activePayload.length) {
-                                                const payload = state.activePayload[0].payload;
-                                                setChartActiveName(payload.name);
-                                                setChartActiveValue(payload.value);
-                                            }
-                                        }}
-                                        onMouseLeave={() => { setChartActiveName(null); setChartActiveValue(null); }}
-                                    >
-                                        <defs>
-                                            <linearGradient id="colorActivity" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.2} />
-                                                <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
-                                            </linearGradient>
-                                        </defs>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                        <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                                        <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                                        <Tooltip content={<CustomTooltip />} />
-                                        {chartActiveName && (
-                                            <ReferenceLine x={chartActiveName} stroke="#e9d5ff" strokeWidth={2} strokeDasharray="4 4" />
-                                        )}
-                                        <Area type="monotone" dataKey="value" stroke="#8b5cf6" strokeWidth={3} fillOpacity={1} fill="url(#colorActivity)" dot={{ r: 3 }} activeDot={{ r: 6 }} animationDuration={800} />
-                                    </AreaChart>
-                                </ResponsiveContainer>
+                                {chartData.length > 0 ? (
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <AreaChart
+                                            data={chartData}
+                                            onMouseMove={(state: any) => {
+                                                if (state && state.activePayload && state.activePayload.length) {
+                                                    const payload = state.activePayload[0].payload;
+                                                    setChartActiveName(payload.name);
+                                                    setChartActiveValue(payload.value);
+                                                }
+                                            }}
+                                            onMouseLeave={() => { setChartActiveName(null); setChartActiveValue(null); }}
+                                        >
+                                            <defs>
+                                                <linearGradient id="colorActivity" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.2} />
+                                                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                                                </linearGradient>
+                                            </defs>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                            <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
+                                            <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
+                                            <Tooltip content={<CustomTooltip />} />
+                                            {chartActiveName && (
+                                                <ReferenceLine x={chartActiveName} stroke="#e9d5ff" strokeWidth={2} strokeDasharray="4 4" />
+                                            )}
+                                            <Area type="monotone" dataKey="value" stroke="#8b5cf6" strokeWidth={3} fillOpacity={1} fill="url(#colorActivity)" dot={{ r: 3 }} activeDot={{ r: 6 }} animationDuration={800} />
+                                        </AreaChart>
+                                    </ResponsiveContainer>
+                                ) : (
+                                    <div className="flex items-center justify-center h-full text-slate-400 text-sm">
+                                        No activity data available for selected time range
+                                    </div>
+                                )}
                                 {chartActiveName && (
                                     <div className="mt-2 text-sm text-slate-600">Selected: <strong className="text-slate-800">{chartActiveName}</strong> — <span className="font-medium">{chartActiveValue}</span></div>
                                 )}
