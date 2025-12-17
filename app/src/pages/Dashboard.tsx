@@ -73,7 +73,9 @@ export function Dashboard() {
     const enrichment = data.external_sources?.helius_orb ?? null;
 
     // Filter chart data by time range
-    const filterDataByRange = (monthlyData: Record<string, number>) => {
+    const filterDataByRange = (monthlyData: Record<string, number> | undefined) => {
+        if (!monthlyData) return [];
+
         const entries = Object.entries(monthlyData).sort((a, b) => a[0].localeCompare(b[0]));
         const now = new Date();
 
@@ -92,7 +94,7 @@ export function Dashboard() {
         return filtered.map(([month, count]) => ({ name: month, value: count }));
     };
 
-    const chartData = filterDataByRange(activity.monthly_frequency);
+    const chartData = filterDataByRange(activity?.monthly_frequency);
 
     // Prefer helius normalized token balances when available, fallback to indexer portfolio tokens
     const tokenData = ((): any[] => {
