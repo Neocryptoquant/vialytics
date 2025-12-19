@@ -213,12 +213,13 @@ export function Dashboard() {
                                 ))}
                             </div>
                         </CardHeader>
-                        <CardContent className="pl-0">
-                            <div className="h-[300px] w-full">
+                        <CardContent className="pl-0 pr-4">
+                            <div style={{ width: '100%', height: 300, minHeight: 300 }}>
                                 {chartData.length > 0 ? (
-                                    <ResponsiveContainer width="100%" height="100%">
+                                    <ResponsiveContainer width="100%" height={300}>
                                         <AreaChart
                                             data={chartData}
+                                            margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
                                             onMouseMove={(state: any) => {
                                                 if (state && state.activePayload && state.activePayload.length) {
                                                     const payload = state.activePayload[0].payload;
@@ -230,7 +231,7 @@ export function Dashboard() {
                                         >
                                             <defs>
                                                 <linearGradient id="colorActivity" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.2} />
+                                                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
                                                     <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
                                                 </linearGradient>
                                             </defs>
@@ -241,7 +242,7 @@ export function Dashboard() {
                                             {chartActiveName && (
                                                 <ReferenceLine x={chartActiveName} stroke="#e9d5ff" strokeWidth={2} strokeDasharray="4 4" />
                                             )}
-                                            <Area type="monotone" dataKey="value" stroke="#8b5cf6" strokeWidth={3} fillOpacity={1} fill="url(#colorActivity)" dot={{ r: 3 }} activeDot={{ r: 6 }} animationDuration={800} />
+                                            <Area type="monotone" dataKey="value" stroke="#8b5cf6" strokeWidth={3} fillOpacity={1} fill="url(#colorActivity)" dot={{ r: 4, fill: '#8b5cf6' }} activeDot={{ r: 6 }} animationDuration={800} />
                                         </AreaChart>
                                     </ResponsiveContainer>
                                 ) : (
