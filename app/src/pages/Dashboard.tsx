@@ -316,38 +316,37 @@ export function Dashboard() {
                             <CardTitle className="text-base font-semibold text-slate-800">Top Income Sources</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="space-y-4">
-                                {(enrichment && enrichment.normalized && enrichment.normalized.top_counterparties) ? (
-                                    (enrichment.normalized.top_counterparties.slice(0, 3)).map((item: any, i: number) => (
-                                        <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                            <div className="space-y-3">
+                                {(enrichment && enrichment.normalized && enrichment.normalized.top_counterparties && enrichment.normalized.top_counterparties.length > 0) ? (
+                                    enrichment.normalized.top_counterparties.slice(0, 3).map((item: any, i: number) => (
+                                        <div key={i} className="flex items-center justify-between p-3 bg-gradient-to-r from-emerald-50 to-white rounded-lg border border-emerald-100">
                                             <div className="flex items-center gap-2">
-                                                <a className="text-sm font-medium text-slate-700 hover:underline" href={`https://orb.helius.dev/address/${item.address}`} target="_blank" rel="noopener noreferrer">{item.label || (item.address.length > 12 ? `${item.address.slice(0, 6)}...${item.address.slice(-6)}` : item.address)}</a>
-                                                <button onClick={() => { setLabelModalData({ label: item.label, address: item.address }); setLabelModalOpen(true); }} className="text-xs text-slate-400 hover:text-slate-600">What is this?</button>
+                                                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                                                {item.address ? (
+                                                    <a
+                                                        className="text-sm font-medium text-slate-700 hover:text-purple-600 transition-colors"
+                                                        href={`https://orb.helius.dev/address/${item.address}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        {item.label}
+                                                    </a>
+                                                ) : (
+                                                    <span className="text-sm font-medium text-slate-700">{item.label}</span>
+                                                )}
                                             </div>
-                                            <span className="text-sm font-bold text-emerald-600">+${(item.usd_volume || 0).toLocaleString()}</span>
+                                            <span className="text-sm font-bold text-emerald-600">+${(item.usd_volume || 0).toFixed(2)}</span>
+                                        </div>
+                                    ))
+                                ) : (data.income_streams?.top_income_sources?.length > 0) ? (
+                                    data.income_streams.top_income_sources.slice(0, 3).map((source: any, i: number) => (
+                                        <div key={i} className="flex items-center justify-between p-3 bg-gradient-to-r from-emerald-50 to-white rounded-lg border border-emerald-100">
+                                            <span className="text-sm font-medium text-slate-700">{source.source}</span>
+                                            <span className="text-sm font-bold text-emerald-600">+${source.value_usd?.toFixed(2) || '0.00'}</span>
                                         </div>
                                     ))
                                 ) : (
-                                    (data.income_streams?.top_income_sources || []).slice(0, 3).map((source: any, i: number) => {
-                                        const addr = source.source;
-                                        const label = addr.length > 12 ? `${addr.slice(0, 4)}...${addr.slice(-4)}` : addr;
-                                        return (
-                                            <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                                                <a
-                                                    className="text-sm font-medium text-slate-700 hover:underline hover:text-purple-600 transition-colors"
-                                                    href={`https://orb.helius.dev/address/${addr}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                >
-                                                    {label}
-                                                </a>
-                                                <span className="text-sm font-bold text-emerald-600">+${source.value_usd.toLocaleString()}</span>
-                                            </div>
-                                        );
-                                    })
-                                )}
-                                {(data.income_streams?.top_income_sources?.length || 0) === 0 && !(enrichment && enrichment.normalized && enrichment.normalized.top_counterparties) && (
-                                    <p className="text-sm text-slate-400 italic">No income sources identified yet.</p>
+                                    <p className="text-sm text-slate-400 italic text-center py-4">No income sources found in recent transactions</p>
                                 )}
                             </div>
                         </CardContent>
@@ -358,23 +357,29 @@ export function Dashboard() {
                             <CardTitle className="text-base font-semibold text-slate-800">Top Spending</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="space-y-4">
+                            <div className="space-y-3">
                                 {(enrichment && enrichment.normalized && enrichment.normalized.top_spending_categories && enrichment.normalized.top_spending_categories.length > 0) ? (
                                     enrichment.normalized.top_spending_categories.slice(0, 3).map((cat: any, i: number) => (
-                                        <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                                            <span className="text-sm font-medium text-slate-700">{cat.category}</span>
+                                        <div key={i} className="flex items-center justify-between p-3 bg-gradient-to-r from-rose-50 to-white rounded-lg border border-rose-100">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-2 h-2 bg-rose-500 rounded-full"></div>
+                                                <span className="text-sm font-medium text-slate-700">{cat.category}</span>
+                                            </div>
                                             <span className="text-sm font-bold text-rose-600">-${cat.value_usd.toFixed(2)}</span>
                                         </div>
                                     ))
                                 ) : (data.spending_categories?.top_spending_categories?.length > 0) ? (
-                                    (data.spending_categories.top_spending_categories).map((cat: any, i: number) => (
-                                        <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                                            <span className="text-sm font-medium text-slate-700">{cat.category}</span>
-                                            <span className="text-sm font-bold text-rose-600">-${cat.value_usd.toFixed(2)}</span>
+                                    data.spending_categories.top_spending_categories.slice(0, 3).map((cat: any, i: number) => (
+                                        <div key={i} className="flex items-center justify-between p-3 bg-gradient-to-r from-rose-50 to-white rounded-lg border border-rose-100">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-2 h-2 bg-rose-500 rounded-full"></div>
+                                                <span className="text-sm font-medium text-slate-700">{cat.category}</span>
+                                            </div>
+                                            <span className="text-sm font-bold text-rose-600">-${cat.value_usd?.toFixed(2) || '0.00'}</span>
                                         </div>
                                     ))
                                 ) : (
-                                    <p className="text-sm text-slate-400 italic">No spending categories identified yet.</p>
+                                    <p className="text-sm text-slate-400 italic text-center py-4">No spending found in recent transactions</p>
                                 )}
                             </div>
                         </CardContent>
