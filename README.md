@@ -9,9 +9,9 @@
 </p>
 
 <p align="center">
-  <a href="https://vialytics.xyz">🌐 Live Demo</a> •
-  <a href="#-watch-the-demo">📺 Pitch Video</a> •
-  <a href="https://x.com/eaabimbola">𝕏 Twitter</a>
+  <a href="https://vialytics.xyz">Live Demo</a> •
+  <a href="#watch-the-demo">Pitch Video</a> •
+  <a href="https://x.com/eaabimbola">Twitter</a>
 </p>
 
 <p align="center">
@@ -24,15 +24,15 @@
 
 ---
 
-## 📺 Watch the Demo
+## Watch the Demo
 
-> **[🎬 Click here to watch the pitch video](YOUR_VIDEO_LINK_HERE)**
+> **[Click here to watch the pitch video](YOUR_VIDEO_LINK_HERE)**
 >
-> *Video coming soon — will be added before final submission*
+> *Video coming soon*
 
 ---
 
-## 🎯 The Problem
+## The Problem
 
 Solana founders and individuals are drowning in data:
 
@@ -41,11 +41,11 @@ Solana founders and individuals are drowning in data:
 - **Block explorers** show transaction hashes, not insights
 - **No simple way** to understand "where is my money going?"
 
-**Result:** Hours wasted trying to make sense of on-chain activity instead of building or investing.
+**Result:** Hours wasted making sense of on-chain activity instead of building.
 
 ---
 
-## 💡 The Solution
+## The Solution
 
 **Vialytics** turns your Solana wallet data into plain-English insights powered by AI.
 
@@ -59,20 +59,20 @@ No dashboards to configure. No SQL to write. Just answers.
 
 ---
 
-## ✨ Key Features
+## Key Features
 
 | Feature | Description |
 |---------|-------------|
-| **🤖 Via AI Chat** | Natural language Q&A about your wallet activity |
-| **📊 Activity Dashboard** | Total balance, money in/out, net flow at a glance |
-| **📈 Activity Charts** | Visual timeline of your on-chain activity |
-| **🏷️ Smart Labels** | Friendly names for known protocols (Jupiter, Raydium, etc.) |
-| **⚡ Rust Indexer** | High-performance transaction processing |
-| **🔌 Helius Integration** | Real-time data enrichment from Helius/Orb |
+| Via AI Chat | Natural language Q&A about your wallet activity |
+| Activity Dashboard | Total balance, money in/out, net flow at a glance |
+| Activity Charts | Visual timeline of your on-chain activity |
+| Smart Labels | Friendly names for known protocols (Jupiter, Raydium, etc.) |
+| Rust Indexer | High-performance transaction processing |
+| Helius Integration | Real-time data enrichment from Helius/Orb |
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 <!-- Replace these placeholders with actual screenshots -->
 
@@ -81,58 +81,45 @@ No dashboards to configure. No SQL to write. Just answers.
   <img src="YOUR_SCREENSHOT_2" alt="Dashboard" width="400"/>
 </p>
 
-<p align="center">
-  <img src="YOUR_SCREENSHOT_3" alt="Via AI Chat" width="400"/>
-  <img src="YOUR_SCREENSHOT_4" alt="Activity Chart" width="400"/>
-</p>
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | React + TypeScript + Bun + Tailwind |
+| Backend | FastAPI (Python) |
+| Indexer | Rust (yellowstone-vixen) |
+| AI | Groq API (llama-3.3-70b) |
+| Data Enrichment | Helius / Orb API |
+| Database | SQLite + Supabase |
 
 ---
 
-## 🛠️ Tech Stack
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        VIALYTICS                            │
-├─────────────────────────────────────────────────────────────┤
-│  Frontend        │  React + TypeScript + Bun + Tailwind     │
-│  Backend         │  FastAPI (Python)                        │
-│  Indexer         │  Rust (yellowstone-vixen)                │
-│  AI              │  Groq API (llama-3.3-70b)                │
-│  Data Enrichment │  Helius / Orb API                        │
-│  Database        │  SQLite + Supabase (caching)             │
-└─────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 🚀 Future Vision
+## Future Vision
 
 ### Phase 1: SDK Release
-Integrate Vialytics into your own app with a simple SDK:
+Integrate Vialytics into your own app:
 
 ```typescript
 import { Vialytics } from '@vialytics/sdk';
-
-const analytics = new Vialytics({ apiKey: 'your-key' });
-const insights = await analytics.getWalletInsights('wallet-address');
+const insights = await Vialytics.analyze('wallet-address');
 ```
 
 ### Phase 2: Team Analytics Platform
-A full platform for founders and teams to:
-- Monitor their **program accounts** and **token treasuries**
-- Set up **alerts** for unusual activity
-- Generate **reports** for stakeholders
-- **No custom indexers needed** — just plug in your addresses
+- Monitor program accounts and token treasuries
+- Set up alerts for unusual activity
+- Generate reports for stakeholders
 
 ### Phase 3: Multi-Chain Expansion
-Extend beyond Solana to support EVM chains and more.
+Extend beyond Solana to support EVM chains.
 
 ---
 
-## 🏃 Quick Start
+## Quick Start
 
 <details>
-<summary><strong>Click to expand setup instructions</strong></summary>
+<summary><strong>Setup Instructions</strong></summary>
 
 ### Prerequisites
 - Bun runtime
@@ -154,49 +141,28 @@ PYTHONPATH=src python -m vialytics_api.api_server
 ```bash
 cd app
 cp .env.example .env
-# Add your VITE_GROQ_API_KEY to .env
 bun install
 bun run dev
 ```
 
 Visit `http://localhost:3000`
 
-### Configuration
-
-**Frontend** (`app/.env`):
-```
-VITE_GROQ_API_KEY=your_groq_api_key
-```
-
-**Backend** (`vialytics-api/.env`):
-```
-HELIUS_API_KEY=your_helius_key
-SUPABASE_URL=your_supabase_url  # optional
-SUPABASE_KEY=your_supabase_key  # optional
-```
-
 </details>
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 vialytics/
 ├── app/                    # Frontend (React + Bun)
-│   ├── src/
-│   │   ├── pages/          # Landing, Loading, Dashboard
-│   │   ├── components/     # Via chat, stats, news
-│   │   └── lib/            # AI integration, labels
 ├── vialytics-api/          # Backend API (FastAPI)
-│   └── src/vialytics_api/
-│       └── services/       # Analytics, Helius, Labels
 └── vialytics-core/         # Transaction indexer (Rust)
 ```
 
 ---
 
-## 👤 Team
+## Team
 
 **Emmanuel Adebayo Abimbola**  
 Solana Turbin3 Q4 Builder
@@ -206,24 +172,20 @@ Solana Turbin3 Q4 Builder
 
 ---
 
-## 🏆 Hackathon
+## Hackathon
 
 Built for the **Solana Student Hackathon**.
 
-This project aims to become the go-to analytics infrastructure for the Solana ecosystem — making wallet intelligence accessible to everyone, from individual traders to protocol teams.
+This project aims to become the go-to analytics infrastructure for the Solana ecosystem.
 
 ---
 
-## 📄 License
+## License
 
 MIT
 
 ---
 
 <p align="center">
-  Made with ❤️ for the Solana ecosystem
-</p>
-
-<p align="center">
-  <a href="https://vialytics.xyz">Try Vialytics Now →</a>
+  <a href="https://vialytics.xyz">Try Vialytics Now</a>
 </p>

@@ -12,24 +12,28 @@ interface ModeContextType {
 const ModeContext = createContext<ModeContextType | undefined>(undefined);
 
 export function ModeProvider({ children }: { children: ReactNode }) {
-    const [mode, setMode] = useState<Mode>(() => {
-        if (typeof window !== "undefined") {
-            return (localStorage.getItem("vialytics-mode") as Mode) || "noob";
-        }
-        return "noob";
-    });
+    const [mode, setMode] = useState<Mode>("noob");
+    const [showComingSoon, setShowComingSoon] = useState(false);
 
     const toggleMode = () => {
-        setMode((prev) => {
-            const newMode = prev === "noob" ? "founder" : "noob";
-            localStorage.setItem("vialytics-mode", newMode);
-            return newMode;
-        });
+        // Founder mode is coming soon - show popup
+        setShowComingSoon(true);
+        setTimeout(() => setShowComingSoon(false), 2000);
     };
 
     return (
         <ModeContext.Provider value={{ mode, toggleMode }}>
             {children}
+            {showComingSoon && (
+                <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl p-8 shadow-2xl text-center max-w-sm mx-4 animate-pulse">
+                        <Zap className="mx-auto text-purple-600 mb-4" size={48} />
+                        <h3 className="text-2xl font-bold text-slate-800 mb-2">Founder Mode</h3>
+                        <p className="text-slate-600">Coming Soon!</p>
+                        <p className="text-sm text-slate-400 mt-2">Team analytics & advanced features</p>
+                    </div>
+                </div>
+            )}
         </ModeContext.Provider>
     );
 }
@@ -54,19 +58,10 @@ export function ModeToggle() {
         <button
             onClick={toggleMode}
             className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
-            title={mode === "noob" ? "Switch to Founder Mode" : "Switch to Noob Mode"}
+            title="Switch to Founder Mode"
         >
-            {mode === "noob" ? (
-                <>
-                    <Moon size={16} />
-                    <span className="text-sm font-semibold">Noob Mode</span>
-                </>
-            ) : (
-                <>
-                    <Zap size={16} />
-                    <span className="text-sm font-semibold">Founder Mode</span>
-                </>
-            )}
+            <Moon size={16} />
+            <span className="text-sm font-semibold">Noob Mode</span>
         </button>
     );
 }
