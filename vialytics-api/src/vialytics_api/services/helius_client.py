@@ -136,6 +136,10 @@ class HeliusClient:
         token_balances = []
         nfts = []
         
+        # Get SOL price for USD conversion (from native balance if available)
+        native_balance = assets.get("nativeBalance", {})
+        sol_price = native_balance.get("price_per_sol", 0) if native_balance else 0
+        
         for item in items:
             interface = item.get("interface", "")
             content = item.get("content", {})
@@ -167,7 +171,6 @@ class HeliusClient:
                 })
         
         # Add native SOL balance if present
-        native_balance = assets.get("nativeBalance", {})
         if native_balance:
             lamports = native_balance.get("lamports", 0)
             sol_amount = lamports / 1e9
@@ -182,30 +185,52 @@ class HeliusClient:
         normalized["token_balances"] = token_balances
         normalized["nfts"] = nfts[:10]  # Limit NFTs
 
-        # Process transactions for counterparties
+        # Process transactions for counterparties and spending categories
         txs = result.get("transactions", [])
-        cp_map: Dict[str, float] = {}
+        income_map: Dict[str, float] = {}  # SOL received from each address
+        spending_map: Dict[str, float] = {}  # SOL spent to each category
         
         for tx in txs[:100]:
             # Extract counterparty and value
-            fee_payer = tx.get("feePayer")
+            fee = tx.get("fee", 0) / 1e9  # Transaction fee in SOL
             native_transfers = tx.get("nativeTransfers", [])
+            
+            # Track network fees as spending
+            if fee > 0:
+                spending_map["Network Fees"] = spending_map.get("Network Fees", 0) + fee
             
             for transfer in native_transfers:
                 from_addr = transfer.get("fromUserAccount")
                 to_addr = transfer.get("toUserAccount")
-                amount = transfer.get("amount", 0) / 1e9  # Convert lamports
+                amount_sol = transfer.get("amount", 0) / 1e9  # Convert lamports to SOL
                 
                 if from_addr == address and to_addr:
-                    cp_map[to_addr] = cp_map.get(to_addr, 0) + amount
+                    # Outgoing transfer - categorize by destination
+                    dest_label = self.label_service.get_label(to_addr) or "Other Transfers"
+                    spending_map[dest_label] = spending_map.get(dest_label, 0) + amount_sol
                 elif to_addr == address and from_addr:
-                    cp_map[from_addr] = cp_map.get(from_addr, 0) + amount
+                    # Incoming transfer - track by source
+                    income_map[from_addr] = income_map.get(from_addr, 0) + amount_sol
 
-        # Top counterparties
-        cps = sorted(cp_map.items(), key=lambda x: x[1], reverse=True)[:10]
+        # Top income sources (counterparties) - convert SOL to USD
+        income_sorted = sorted(income_map.items(), key=lambda x: x[1], reverse=True)[:10]
         normalized["top_counterparties"] = [
-            {"address": a, "label": self.label_service.get_label(a), "usd_volume": v}
-            for a, v in cps
+            {
+                "address": addr, 
+                "label": self.label_service.get_label(addr), 
+                "usd_volume": sol_amount * sol_price
+            }
+            for addr, sol_amount in income_sorted
+        ]
+
+        # Top spending categories - convert SOL to USD
+        spending_sorted = sorted(spending_map.items(), key=lambda x: x[1], reverse=True)[:10]
+        normalized["top_spending_categories"] = [
+            {
+                "category": category,
+                "value_usd": sol_amount * sol_price
+            }
+            for category, sol_amount in spending_sorted
         ]
 
         return normalized

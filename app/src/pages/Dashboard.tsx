@@ -365,15 +365,14 @@ export function Dashboard() {
                                             <span className="text-sm font-bold text-rose-600">-${cat.value_usd.toFixed(2)}</span>
                                         </div>
                                     ))
-                                ) : (
-                                    (data.spending_categories?.top_spending_categories || []).map((cat: any, i: number) => (
+                                ) : (data.spending_categories?.top_spending_categories?.length > 0) ? (
+                                    (data.spending_categories.top_spending_categories).map((cat: any, i: number) => (
                                         <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                                             <span className="text-sm font-medium text-slate-700">{cat.category}</span>
                                             <span className="text-sm font-bold text-rose-600">-${cat.value_usd.toFixed(2)}</span>
                                         </div>
                                     ))
-                                )}
-                                {(data.spending_categories?.top_spending_categories?.length || 0) === 0 && (
+                                ) : (
                                     <p className="text-sm text-slate-400 italic">No spending categories identified yet.</p>
                                 )}
                             </div>
