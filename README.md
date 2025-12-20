@@ -23,10 +23,11 @@
 
 ---
 
-## Watch the Demo
+## Pitch Deck && Demo Links
 
+> **[Click to see the Pitch Deck and Technical Demo here](https://drive.google.com/drive/folders/1FZzBWBt5c8PN9fLzoZDp2mzOt9XLl5VH?usp=drive_link)**
 > **[Click here to watch the pitch video](YOUR_VIDEO_LINK_HERE)**
->
+> **
 > *Video coming soon*
 
 ---
