@@ -51,7 +51,10 @@ class LabelService:
             "TCMPhJdwDryooaGtiocG1u3xcYbRpiJzb283XfCZsDp": "Tensor Compressed",
             "hausS13jsjafwWwGqZTUQRmWyvyxn9EQpqMwV1PBBmk": "Haus (NFT)",
             
-            # Infrastructure
+            # On/Off Ramps & Payment
+            "PAJiru53LQMrK3vMGKvxfWCXudBzsmaCuqe6SQWxuS3L": "Paj Cash",
+            
+            # Infrastructure & Tools
             "jito1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX": "Jito",
             "BNswQ54RR5xVFP4xLu2c1zJBH5RxaJ8n7HMdCYzMzPJR": "Birdeye",
         }

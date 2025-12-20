@@ -185,12 +185,12 @@ class HeliusClient:
         normalized["token_balances"] = token_balances
         normalized["nfts"] = nfts[:10]  # Limit NFTs
 
-        # Process transactions for protocol interactions and spending
+        # Process transactions for income sources and spending categories
         txs = result.get("transactions", [])
         
-        # Maps for tracking
-        protocol_income: Dict[str, float] = {}  # Protocol -> SOL received
-        protocol_spending: Dict[str, float] = {}  # Protocol/Category -> SOL spent
+        # Tracking maps - store (address, label, sol_amount)
+        income_by_source: Dict[str, Dict] = {}  # address -> {label, sol_amount}
+        spending_by_category: Dict[str, float] = {}  # category/protocol -> sol_amount
         total_fees = 0.0
         
         # Protocol name mapping for cleaner display
@@ -206,8 +206,7 @@ class HeliusClient:
             "METAPLEX": "Metaplex",
             "HELIUM": "Helium",
             "SOLANA_PROGRAM_LIBRARY": "SPL",
-            "SYSTEM_PROGRAM": "System",
-            "UNKNOWN": "Other DeFi",
+            "SYSTEM_PROGRAM": "System Transfer",
         }
         
         for tx in txs[:100]:
@@ -220,7 +219,7 @@ class HeliusClient:
             total_fees += fee
             
             # Get protocol label
-            protocol_label = source_labels.get(source, source.replace("_", " ").title())
+            protocol_label = source_labels.get(source, source.replace("_", " ").title() if source != "UNKNOWN" else None)
             
             # Process native SOL transfers
             native_transfers = tx.get("nativeTransfers", [])
@@ -229,60 +228,79 @@ class HeliusClient:
                 to_addr = transfer.get("toUserAccount")
                 amount_sol = transfer.get("amount", 0) / 1e9
                 
-                if from_addr == address and to_addr and amount_sol > 0:
-                    # Outgoing - categorize by protocol source
-                    if source != "UNKNOWN" and source != "SYSTEM_PROGRAM":
-                        protocol_spending[protocol_label] = protocol_spending.get(protocol_label, 0) + amount_sol
+                # Skip tiny amounts and self-transfers
+                if amount_sol < 0.0001:
+                    continue
+                if from_addr == to_addr:
+                    continue
+                    
+                # OUTGOING: User sent SOL somewhere
+                if from_addr == address and to_addr:
+                    # Skip if sending to self
+                    if to_addr == address:
+                        continue
+                    
+                    # Categorize spending
+                    if protocol_label and source not in ["UNKNOWN", "SYSTEM_PROGRAM"]:
+                        # Protocol-based spending (Jupiter swap, etc.)
+                        spending_by_category[protocol_label] = spending_by_category.get(protocol_label, 0) + amount_sol
                     else:
-                        # Try to get label from destination
+                        # Direct transfer - use destination label or address
                         dest_label = self.label_service.get_label(to_addr)
-                        if dest_label and not dest_label.startswith(to_addr[:4]):
-                            protocol_spending[dest_label] = protocol_spending.get(dest_label, 0) + amount_sol
+                        if not dest_label.startswith(to_addr[:4]):  # It's a known address
+                            spending_by_category[dest_label] = spending_by_category.get(dest_label, 0) + amount_sol
                         else:
-                            protocol_spending["Transfers Out"] = protocol_spending.get("Transfers Out", 0) + amount_sol
-                            
-                elif to_addr == address and from_addr and amount_sol > 0:
-                    # Incoming - track by source protocol
-                    if source != "UNKNOWN" and source != "SYSTEM_PROGRAM":
-                        protocol_income[protocol_label] = protocol_income.get(protocol_label, 0) + amount_sol
-                    else:
+                            # Unknown - categorize as "Transfers"
+                            spending_by_category["Transfers Out"] = spending_by_category.get("Transfers Out", 0) + amount_sol
+                
+                # INCOMING: User received SOL from somewhere
+                elif to_addr == address and from_addr:
+                    # Skip if receiving from self
+                    if from_addr == address:
+                        continue
+                    
+                    # Track income by source address
+                    if from_addr not in income_by_source:
                         src_label = self.label_service.get_label(from_addr)
-                        if src_label and not src_label.startswith(from_addr[:4]):
-                            protocol_income[src_label] = protocol_income.get(src_label, 0) + amount_sol
-                        else:
-                            protocol_income["Transfers In"] = protocol_income.get("Transfers In", 0) + amount_sol
+                        # Override with protocol if known
+                        if protocol_label and source not in ["UNKNOWN", "SYSTEM_PROGRAM"]:
+                            src_label = protocol_label
+                        income_by_source[from_addr] = {"label": src_label, "sol_amount": 0, "address": from_addr}
+                    income_by_source[from_addr]["sol_amount"] += amount_sol
             
-            # Also count token transfers as protocol interaction
+            # Track token transfers for protocol interactions
             token_transfers = tx.get("tokenTransfers", [])
-            if token_transfers and source != "UNKNOWN":
-                # Add a small value to show the protocol was used (even if no SOL moved)
+            if token_transfers and protocol_label and source not in ["UNKNOWN", "SYSTEM_PROGRAM"]:
                 for tt in token_transfers:
                     from_addr = tt.get("fromUserAccount")
                     to_addr = tt.get("toUserAccount") 
-                    token_amount = tt.get("tokenAmount", 0)
                     
-                    if from_addr == address and token_amount > 0:
-                        protocol_spending[protocol_label] = protocol_spending.get(protocol_label, 0) + 0.001  # Nominal value to show interaction
-                    elif to_addr == address and token_amount > 0:
-                        protocol_income[protocol_label] = protocol_income.get(protocol_label, 0) + 0.001
+                    if from_addr == address:
+                        # Outgoing token = spending via protocol
+                        spending_by_category[protocol_label] = spending_by_category.get(protocol_label, 0) + 0.01
+                    elif to_addr == address:
+                        # Incoming token from protocol (swap output, etc.)
+                        if protocol_label not in income_by_source:
+                            income_by_source[protocol_label] = {"label": protocol_label, "sol_amount": 0, "address": ""}
+                        income_by_source[protocol_label]["sol_amount"] += 0.01
 
         # Add network fees to spending
         if total_fees > 0:
-            protocol_spending["Network Fees"] = total_fees
+            spending_by_category["Network Fees"] = total_fees
 
-        # Top income sources (protocols) - convert SOL to USD
-        income_sorted = sorted(protocol_income.items(), key=lambda x: x[1], reverse=True)[:5]
+        # Top income sources - sorted by SOL amount, convert to USD
+        income_sorted = sorted(income_by_source.values(), key=lambda x: x["sol_amount"], reverse=True)[:5]
         normalized["top_counterparties"] = [
             {
-                "address": "",  # No address for protocol-based tracking
-                "label": protocol,
-                "usd_volume": sol_amount * sol_price
+                "address": item.get("address", ""),
+                "label": item["label"],
+                "usd_volume": item["sol_amount"] * sol_price
             }
-            for protocol, sol_amount in income_sorted
+            for item in income_sorted
         ]
 
         # Top spending categories - convert SOL to USD  
-        spending_sorted = sorted(protocol_spending.items(), key=lambda x: x[1], reverse=True)[:5]
+        spending_sorted = sorted(spending_by_category.items(), key=lambda x: x[1], reverse=True)[:5]
         normalized["top_spending_categories"] = [
             {
                 "category": category,
