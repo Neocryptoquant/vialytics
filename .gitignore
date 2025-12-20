@@ -24,3 +24,4 @@ vialytics-core/Cargo.lock
 
 # Internal docs (not for public repo)
 docs/
+wrapped-worker/

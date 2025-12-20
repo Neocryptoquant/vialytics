@@ -19,7 +19,6 @@
   <img src="https://img.shields.io/badge/Rust-black?logo=rust&logoColor=orange" alt="Rust"/>
   <img src="https://img.shields.io/badge/React-black?logo=react" alt="React"/>
   <img src="https://img.shields.io/badge/FastAPI-black?logo=fastapi" alt="FastAPI"/>
-  <img src="https://img.shields.io/badge/AI%20Powered-black?logo=openai" alt="AI"/>
 </p>
 
 ---
@@ -34,12 +33,12 @@
 
 ## The Problem
 
-Solana founders and individuals are drowning in data:
+Solana founders and individuals are drowning in Big data:
 
 - **Dune Analytics** requires SQL knowledge and custom dashboard setup
 - **Alchemy** and similar tools provide raw data overload
 - **Block explorers** show transaction hashes, not insights
-- **No simple way** to understand "where is my money going?"
+- **No simple way** to understand "where is my money going or how my program is functioning?"
 
 **Result:** Hours wasted making sense of on-chain activity instead of building.
 
@@ -47,7 +46,7 @@ Solana founders and individuals are drowning in data:
 
 ## The Solution
 
-**Vialytics** turns your Solana wallet data into plain-English insights powered by AI.
+**Vialytics** turns your Solana wallet data into plain insights enhanced by AI.
 
 Just paste your wallet address and ask Via — our AI assistant — anything:
 
@@ -174,7 +173,7 @@ Solana Turbin3 Q4 Builder
 
 ## Hackathon
 
-Built for the **Solana Student Hackathon**.
+Built with love for the **Everyone**.
 
 This project aims to become the go-to analytics infrastructure for the Solana ecosystem.
 
@@ -183,9 +182,3 @@ This project aims to become the go-to analytics infrastructure for the Solana ec
 ## License
 
 MIT
-
----
-
-<p align="center">
-  <a href="https://vialytics.xyz">Try Vialytics Now</a>
-</p>
