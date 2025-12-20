@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://vialytics.xyz">Live Demo</a> •
-  <a href="#watch-the-demo">Pitch Video</a> •
+  <a href="https://www.loom.com/share/4e215977cbb54d6e8efb6dd411f772f1">Pitch Video</a> •
   <a href="https://x.com/eaabimbola">Twitter</a>
 </p>
 
@@ -25,11 +25,9 @@
 
 ## Pitch Deck && Demo Links
 
-> **[Click to see the Pitch Deck and Technical Demo here](https://drive.google.com/drive/folders/1FZzBWBt5c8PN9fLzoZDp2mzOt9XLl5VH?usp=drive_link)**
-> **[Click here to watch the pitch video](YOUR_VIDEO_LINK_HERE)**
-> **
-> *Video coming soon*
-
+* **[Click to see the Pitch Deck here](https://drive.google.com/drive/folders/1FZzBWBt5c8PN9fLzoZDp2mzOt9XLl5VH?usp=drive_link)**
+* **[Click here to watch the pitch video](https://www.loom.com/share/4e215977cbb54d6e8efb6dd411f772f1)**
+* Alternative link: https://www.loom.com/share/4e215977cbb54d6e8efb6dd411f772f1 
 ---
 
 ## The Problem
@@ -73,15 +71,8 @@ No dashboards to configure. No SQL to write. Just answers.
 ---
 
 ## Screenshots
+<img width="1920" height="901" alt="image" src="https://github.com/user-attachments/assets/7b7765f9-7841-4aab-b8eb-36cc5398d17e" />
 
-<!-- Replace these placeholders with actual screenshots -->
-
-<p align="center">
-  <img src="YOUR_SCREENSHOT_1" alt="Landing Page" width="400"/>
-  <img src="YOUR_SCREENSHOT_2" alt="Dashboard" width="400"/>
-</p>
-
----
 
 ## Tech Stack
 
@@ -96,7 +87,7 @@ No dashboards to configure. No SQL to write. Just answers.
 
 ---
 
-## Future Vision
+## Future Iteration
 
 ### Phase 1: SDK Release
 Integrate Vialytics into your own app:
@@ -106,13 +97,11 @@ import { Vialytics } from '@vialytics/sdk';
 const insights = await Vialytics.analyze('wallet-address');
 ```
 
-### Phase 2: Team Analytics Platform
+### Phase 2: Founder Mode
 - Monitor program accounts and token treasuries
 - Set up alerts for unusual activity
 - Generate reports for stakeholders
 
-### Phase 3: Multi-Chain Expansion
-Extend beyond Solana to support EVM chains.
 
 ---
 
@@ -170,11 +159,8 @@ Solana Turbin3 Q4 Builder
 - GitHub: [@neocryptoquant](https://github.com/neocryptoquant)
 - X/Twitter: [@eaabimbola](https://x.com/eaabimbola)
 
----
 
-## Hackathon
-
-Built with love for the **Everyone**.
+Built with 😘❤️ for **Everyone**.
 
 This project aims to become the go-to analytics infrastructure for the Solana ecosystem.
 
